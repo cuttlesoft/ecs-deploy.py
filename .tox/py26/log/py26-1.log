@@ -1,0 +1,29 @@
+actionid: py26
+msg: getenv
+cmdargs: [local('/Users/benji/cuttlesoft/ecs-deploy.py/.tox/py26/bin/pip'), 'install', 'pytest', 'pytest-pep8', 'pytest-cov']
+env: {'rvm_version': '1.27.0 (latest)', 'VERSIONER_PYTHON_PREFER_32_BIT': 'no', 'rvm_path': '/Users/benji/.rvm', 'TERM_PROGRAM_VERSION': '3.0.10', 'RUBY_VERSION': 'ruby-2.3.0', 'LOGNAME': 'benji', 'USER': 'benji', 'HOME': '/Users/benji', 'PATH': '/Users/benji/cuttlesoft/ecs-deploy.py/.tox/py26/bin:/Users/benji/virtualenvs/ecs/bin:/Users/benji/.rvm/gems/ruby-2.3.0/bin:/Users/benji/.rvm/gems/ruby-2.3.0@global/bin:/Users/benji/.rvm/rubies/ruby-2.3.0/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:/opt/ImageMagick/bin:/Users/benji/.rvm/bin', 'VIRTUALENVWRAPPER_SCRIPT': '/usr/local/bin/virtualenvwrapper.sh', 'TERM_PROGRAM': 'iTerm.app', 'LANG': 'en_US.UTF-8', 'TERM': 'xterm-256color', 'SHELL': '/bin/bash', 'VERSIONER_PYTHON_VERSION': '2.7', 'SHLVL': '1', 'PWD': '/Users/benji/cuttlesoft/ecs-deploy.py', 'XPC_FLAGS': '0x0', 'ITERM_SESSION_ID': 'w0t0p1:2A7894A9-EC35-4866-A138-E96E600FB861', 'PYTHONHASHSEED': '1617700093', 'TMPDIR': '/var/folders/zp/y0scyc0j4cg418ld_v01d4840000gn/T/', '_system_arch': 'x86_64', 'GEM_PATH': '/Users/benji/.rvm/gems/ruby-2.3.0:/Users/benji/.rvm/gems/ruby-2.3.0@global', 'rvm_bin_path': '/Users/benji/.rvm/bin', 'WORKON_HOME': '/Users/benji/virtualenvs/', 'TERM_SESSION_ID': 'w0t0p1:2A7894A9-EC35-4866-A138-E96E600FB861', 'SSH_AUTH_SOCK': '/private/tmp/com.apple.launchd.lMyk0HuXvQ/Listeners', 'rvm_prefix': '/Users/benji', 'Apple_PubSub_Socket_Render': '/private/tmp/com.apple.launchd.AlyAXlKwYl/Render', 'XPC_SERVICE_NAME': '0', 'VIRTUAL_ENV': '/Users/benji/cuttlesoft/ecs-deploy.py/.tox/py26', 'IRBRC': '/Users/benji/.rvm/rubies/ruby-2.3.0/.irbrc', 'MY_RUBY_HOME': '/Users/benji/.rvm/rubies/ruby-2.3.0', 'VIRTUALENVWRAPPER_WORKON_CD': '1', 'PS1': '(ecs) \\h:\\W \\u\\$ ', 'ITERM_PROFILE': 'Hotkey Window', '_system_type': 'Darwin', '_': '/Users/benji/virtualenvs/ecs/bin/tox', 'VIRTUALENVWRAPPER_PROJECT_FILENAME': '.project', 'VIRTUALENVWRAPPER_HOOK_DIR': '/Users/benji/virtualenvs/', 'OLDPWD': '/Users/benji', '__CF_USER_TEXT_ENCODING': '0x1F5:0x0:0x0', '_system_name': 'OSX', '_system_version': '10.11', 'GEM_HOME': '/Users/benji/.rvm/gems/ruby-2.3.0'}
+
+DEPRECATION: Python 2.6 is no longer supported by the Python core team, please upgrade your Python. A future version of pip will drop support for Python 2.6
+Collecting pytest
+/Users/benji/cuttlesoft/ecs-deploy.py/.tox/py26/lib/python2.6/site-packages/pip/_vendor/requests/packages/urllib3/util/ssl_.py:318: SNIMissingWarning: An HTTPS request has been made, but the SNI (Subject Name Indication) extension to TLS is not available on this platform. This may cause the server to present an incorrect TLS certificate, which can cause validation failures. You can upgrade to a newer version of Python to solve this. For more information, see https://urllib3.readthedocs.org/en/latest/security.html#snimissingwarning.
+  SNIMissingWarning
+/Users/benji/cuttlesoft/ecs-deploy.py/.tox/py26/lib/python2.6/site-packages/pip/_vendor/requests/packages/urllib3/util/ssl_.py:122: InsecurePlatformWarning: A true SSLContext object is not available. This prevents urllib3 from configuring SSL appropriately and may cause certain SSL connections to fail. You can upgrade to a newer version of Python to solve this. For more information, see https://urllib3.readthedocs.org/en/latest/security.html#insecureplatformwarning.
+  InsecurePlatformWarning
+  Using cached pytest-3.0.2-py2.py3-none-any.whl
+Collecting pytest-pep8
+Collecting pytest-cov
+  Using cached pytest_cov-2.3.1-py2.py3-none-any.whl
+Collecting py>=1.4.29 (from pytest)
+  Using cached py-1.4.31-py2.py3-none-any.whl
+Requirement already satisfied (use --upgrade to upgrade): argparse; python_version == "2.6" in ./.tox/py26/lib/python2.6/site-packages (from pytest)
+Collecting pep8>=1.3 (from pytest-pep8)
+  Using cached pep8-1.7.0-py2.py3-none-any.whl
+Collecting pytest-cache (from pytest-pep8)
+Collecting coverage>=3.7.1 (from pytest-cov)
+  Using cached coverage-4.2-cp26-cp26m-macosx_10_10_x86_64.whl
+Collecting execnet>=1.1.dev1 (from pytest-cache->pytest-pep8)
+  Using cached execnet-1.4.1-py2.py3-none-any.whl
+Collecting apipkg>=1.4 (from execnet>=1.1.dev1->pytest-cache->pytest-pep8)
+  Using cached apipkg-1.4-py2.py3-none-any.whl
+Installing collected packages: py, pytest, pep8, apipkg, execnet, pytest-cache, pytest-pep8, coverage, pytest-cov
+Successfully installed apipkg-1.4 coverage-4.2 execnet-1.4.1 pep8-1.7.0 py-1.4.31 pytest-3.0.2 pytest-cache-1.0 pytest-cov-2.3.1 pytest-pep8-1.0.6

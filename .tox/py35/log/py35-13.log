@@ -1,0 +1,15 @@
+actionid: py35
+msg: envreport
+cmdargs: ['/Users/benji/cuttlesoft/ecs-deploy.py/.tox/py35/bin/pip', 'freeze']
+env: {'rvm_version': '1.27.0 (latest)', 'VERSIONER_PYTHON_PREFER_32_BIT': 'no', 'rvm_path': '/Users/benji/.rvm', 'TERM_PROGRAM_VERSION': '3.0.10', 'RUBY_VERSION': 'ruby-2.3.0', 'LOGNAME': 'benji', 'USER': 'benji', 'HOME': '/Users/benji', 'PATH': '/Users/benji/cuttlesoft/ecs-deploy.py/.tox/py35/bin:/Users/benji/virtualenvs/ecs/bin:/Users/benji/.rvm/gems/ruby-2.3.0/bin:/Users/benji/.rvm/gems/ruby-2.3.0@global/bin:/Users/benji/.rvm/rubies/ruby-2.3.0/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:/opt/ImageMagick/bin:/Users/benji/.rvm/bin', 'VIRTUALENVWRAPPER_SCRIPT': '/usr/local/bin/virtualenvwrapper.sh', 'TERM_PROGRAM': 'iTerm.app', 'LANG': 'en_US.UTF-8', 'TERM': 'xterm-256color', 'SHELL': '/bin/bash', 'VERSIONER_PYTHON_VERSION': '2.7', 'SHLVL': '1', 'PWD': '/Users/benji/cuttlesoft/ecs-deploy.py', 'XPC_FLAGS': '0x0', 'ITERM_SESSION_ID': 'w0t0p1:2A7894A9-EC35-4866-A138-E96E600FB861', 'PYTHONHASHSEED': '1473359563', 'TMPDIR': '/var/folders/zp/y0scyc0j4cg418ld_v01d4840000gn/T/', '_system_arch': 'x86_64', 'GEM_PATH': '/Users/benji/.rvm/gems/ruby-2.3.0:/Users/benji/.rvm/gems/ruby-2.3.0@global', 'rvm_bin_path': '/Users/benji/.rvm/bin', 'WORKON_HOME': '/Users/benji/virtualenvs/', 'TERM_SESSION_ID': 'w0t0p1:2A7894A9-EC35-4866-A138-E96E600FB861', 'SSH_AUTH_SOCK': '/private/tmp/com.apple.launchd.lMyk0HuXvQ/Listeners', 'rvm_prefix': '/Users/benji', 'Apple_PubSub_Socket_Render': '/private/tmp/com.apple.launchd.AlyAXlKwYl/Render', 'XPC_SERVICE_NAME': '0', 'VIRTUAL_ENV': '/Users/benji/cuttlesoft/ecs-deploy.py/.tox/py35', 'IRBRC': '/Users/benji/.rvm/rubies/ruby-2.3.0/.irbrc', 'MY_RUBY_HOME': '/Users/benji/.rvm/rubies/ruby-2.3.0', 'VIRTUALENVWRAPPER_WORKON_CD': '1', 'PS1': '(ecs) \\h:\\W \\u\\$ ', 'ITERM_PROFILE': 'Hotkey Window', '_system_type': 'Darwin', '_': '/Users/benji/virtualenvs/ecs/bin/tox', 'VIRTUALENVWRAPPER_PROJECT_FILENAME': '.project', 'VIRTUALENVWRAPPER_HOOK_DIR': '/Users/benji/virtualenvs/', 'OLDPWD': '/Users/benji', '__CF_USER_TEXT_ENCODING': '0x1F5:0x0:0x0', '_system_name': 'OSX', '_system_version': '10.11', 'GEM_HOME': '/Users/benji/.rvm/gems/ruby-2.3.0'}
+
+apipkg==1.4
+coverage==4.2
+execnet==1.4.1
+pep8==1.7.0
+py==1.4.31
+pytest==3.0.2
+pytest-cache==1.0
+pytest-cov==2.3.1
+pytest-pep8==1.0.6
+UNKNOWN==0.0.0

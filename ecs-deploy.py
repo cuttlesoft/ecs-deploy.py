@@ -31,7 +31,8 @@ def new_task_definition(family, definition, image):
     try:
         """
         see all parameters here:
-        http://boto3.readthedocs.io/en/latest/reference/services/ecs.html#ECS.Client.register_task_definition
+        http://boto3.readthedocs.io/en/latest/reference/services/ecs.html#ECS.\
+        Client.register_task_definition
         """
         response = client.register_task_definition(
             family=family,
@@ -49,7 +50,8 @@ def new_task_definition(family, definition, image):
         return False
 
 
-def update_service(cluster, service, count, task_definition, min_healthy, max_healthy):
+def update_service(cluster, service, count, task_definition, min_healthy,
+                   max_healthy):
     """
     Registers a new ECS Task definition
     """
@@ -62,7 +64,8 @@ def update_service(cluster, service, count, task_definition, min_healthy, max_he
     try:
         """
         see all parameters here:
-        http://boto3.readthedocs.io/en/latest/reference/services/ecs.html#ECS.Client.update_service
+        http://boto3.readthedocs.io/en/latest/reference/services/ecs.html#ECS.\
+        Client.update_service
         """
         response = client.update_service(
             cluster=cluster,
@@ -70,7 +73,8 @@ def update_service(cluster, service, count, task_definition, min_healthy, max_he
             desiredCount=count,
             taskDefinition=task_definition,
             deploymentConfiguration={
-                # more information on the max and min healthy percentages can be found here:
+                # more information on the max and min healthy percentages
+                # can be found here:
                 # http://docs.aws.amazon.com/AmazonECS/latest/developerguide/update-service.html
                 'maximumPercent': max_healthy,
                 'minimumHealthyPercent': min_healthy
@@ -91,14 +95,17 @@ def main():
         "definition",
         help="The path to an ECS Task Definition file in JSON format.  " /
         "See this for details:  http://docs.aws.amazon.com/AmazonECS/" /
-        "latest/developerguide/task_definition_parameters.html#container_definitions"
+        "latest/developerguide/task_definition_parameters.html#\
+        container_definitions"
     )
-    parser.add_argument("image", help="The Docker Image to be used in the Task")
-    parser.add_argument("count", help="The desired number of Tasks to be running")
+    parser.add_argument("image",
+                        help="The Docker Image to be used in the Task")
+    parser.add_argument("count",
+                        help="The desired number of Tasks to be running")
     parser.add_argument("min_healthy", help="The minimum number of healthy " /
-        "containers that should be running on the cluster")
+                        "containers that should be running on the cluster")
     parser.add_argument("max_healthy", help="The maximum number of healthy " /
-        "containers that should be running on the cluster")
+                        "containers that should be running on the cluster")
     args = parser.parse_args()
 
     cluster = os.getenv('ECS_CLUSTER_NAME')
@@ -107,8 +114,9 @@ def main():
     task_definition = new_task_definition(family, args.definition, args.image)
 
     if task_definition:
-        if not update_service(cluster, service, int(args.count), task_definition,
-                int(args.min_healthy), int(args.max_healthy)):
+        if not update_service(cluster, service, int(args.count),
+                              task_definition, int(args.min_healthy),
+                              int(args.max_healthy)):
             sys.exit(1)
     else:
         sys.exit(1)

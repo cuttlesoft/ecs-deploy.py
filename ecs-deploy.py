@@ -93,19 +93,19 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "definition",
-        help="The path to an ECS Task Definition file in JSON format.  " /
-        "See this for details:  http://docs.aws.amazon.com/AmazonECS/" /
-        "latest/developerguide/task_definition_parameters.html#\
+        help="The path to an ECS Task Definition file in JSON format.  \
+        See this for details:  http://docs.aws.amazon.com/AmazonECS/\
+        latest/developerguide/task_definition_parameters.html#\
         container_definitions"
     )
     parser.add_argument("image",
                         help="The Docker Image to be used in the Task")
     parser.add_argument("count",
                         help="The desired number of Tasks to be running")
-    parser.add_argument("min_healthy", help="The minimum number of healthy " /
-                        "containers that should be running on the cluster")
-    parser.add_argument("max_healthy", help="The maximum number of healthy " /
-                        "containers that should be running on the cluster")
+    parser.add_argument("min_healthy", help="The minimum number of healthy \
+                        containers that should be running on the cluster")
+    parser.add_argument("max_healthy", help="The maximum number of healthy \
+                        containers that should be running on the cluster")
     args = parser.parse_args()
 
     cluster = os.getenv('ECS_CLUSTER_NAME')

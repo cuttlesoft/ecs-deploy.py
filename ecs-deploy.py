@@ -139,25 +139,25 @@ class CLI(object):
 
     def _run_parser(self, args):
         if not args.get('task_definition'):
-            service = self.get_service(args.get('service_name'), args.get('cluster'))
-            arn = service['services'][0]['taskDefinition']
-            name = arn.split('/')[1].split(':')[0]
-            print(name)
-            task_definition = self.get_task_definition(name)
+            service_name = args.get('service_name')
+            task_definition_name = get_service_something(service_name, args.get('cluster'))['services'][0]['taskDefinition'].split('/')[1].split(':')[0]
+            task_definition = get_task_definition(task_definition_name)
 
         else:
-            task_definition = self.get_task_definition(args.get('task_definition'))
+            client = boto3.client('ecs')
+            task_definition = get_task_definition(args.get('task_definition'))
+            for service in client.list_services(cluster=args.get('cluster'))['serviceArns']:
+                if task_definition['family'] in service:
+                    service_name = service.split('/')[1].split(':')[0]
 
-        print(task_definition)
-        task_definition = self.register_task_definition(task_definition, args.get('image'))
-        print(task_definition)
-
-        if task_definition:
-            if not self.update_service(args.get('cluster'), args.get('service_name'), args.get('task_definition')):
-                sys.exit(1)
-            # wait and make sure things worked
-        else:
-            sys.exit(1)
+        # task_definition = new_task_definition(task_definition, args.get('image'))
+        #
+        # if task_definition:
+        #     if not update_service(args.get('cluster'), service_name, task_definition['family']):
+        #         sys.exit(1)
+        #     # wait and make sure things worked
+        # else:
+        #     sys.exit(1)
 
     def get_service(self, service, cluster):
         """

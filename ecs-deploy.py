@@ -28,6 +28,10 @@ class CLI(object):
             print('Failed to create boto3 client.\n%s' % err)
             sys.exit(1)
 
+        if not (args.get('task_definition') or args.get('service_name')):
+            print('Either task-definition or service-name must be provided.')
+            sys.exit(1)
+
         # run script
         self._run_parser(args)
 
@@ -138,19 +142,23 @@ class CLI(object):
         return vars(args)
 
     def _run_parser(self, args):
-        if not args.get('task_definition'):
-            service_name = args.get('service_name')
-            task_definition_name = get_service_something(service_name, args.get('cluster'))['services'][0]['taskDefinition'].split('/')[1].split(':')[0]
-            task_definition = get_task_definition(task_definition_name)
+        cluster = args.get('cluster')
 
-        else:
-            client = boto3.client('ecs')
-            task_definition = get_task_definition(args.get('task_definition'))
-            for service in client.list_services(cluster=args.get('cluster'))['serviceArns']:
-                if task_definition['family'] in service:
-                    service_name = service.split('/')[1].split(':')[0]
+        if args.get('task_definition'):
+            task_definition_name = args.get('task_definition')
 
-        # task_definition = new_task_definition(task_definition, args.get('image'))
+        elif args.get('service_name'):
+            service = self.get_service(args.get('service_name'), cluster)
+            arn = service['services'][0]['taskDefinition']
+            task_definition_name = arn.split('/')[1].split(':')[0]
+
+        task_definition = self.get_task_definition(task_definition_name)
+
+        for service in self.client.list_services(cluster=cluster)['serviceArns']:
+            if task_definition['family'] in service:
+                service_name = service.split('/')[1].split(':')[0]
+
+        # task_definition = self.register_task_definition(task_definition, args.get('image'))
         #
         # if task_definition:
         #     if not update_service(args.get('cluster'), service_name, task_definition['family']):

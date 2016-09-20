@@ -121,5 +121,132 @@ def main():
     else:
         sys.exit(1)
 
+
+class CLI(object):
+
+    def __init__(self):
+        args = self._init_parser()
+        # print(args)
+
+        if not (args.get('service_name') or args.get('task_definition')):
+            print('Either "service-name" or "task-definition" is required.')
+        else:
+            print('Service name: %s' % args.get('service_name'))
+            print('Task definition: %s' % args.get('task_definition'))
+
+    def _init_parser(self):
+        parser = argparse.ArgumentParser(
+            description='AWS ECS Deployment Script',
+            usage='''ecs-deploy.py [<args>]
+
+Required:
+    ...
+
+Optional:
+    ...
+
+        ''')
+
+        # REQUIRED ARGS : AT LEAST ONE
+
+        parser.add_argument(
+            '-n',
+            '--service-name',
+            help='Name of service to deploy (either service-name or task-definition is required)')
+
+        parser.add_argument(
+            '-d',
+            '--task-definition',
+            nargs='?',
+            help='Name of task definition to deploy (either task-definition or service-name is required)')
+
+        # REQUIRED ARGS : AT LEAST SOMEWHERE
+
+        parser.add_argument(
+            '-k',
+            '--aws-access-key',
+            help='AWS Access Key ID. May also be set as environment variable AWS_ACCESS_KEY_ID')
+
+        parser.add_argument(
+            '-s',
+            '--aws-secret-key',
+            help='AWS Secret Access Key. May also be set as environment variable AWS_SECRET_ACCESS_KEY')
+
+        parser.add_argument(
+            '-r',
+            '--region',
+            help='AWS Region Name. May also be set as environment variable AWS_DEFAULT_REGION')
+
+        # REQUIRED ARGS : MAYBE NOT REQUIRED
+
+        parser.add_argument(
+            '-p',
+            '--profile',
+            help='AWS Profile to use (if you set this aws-access-key, aws-secret-key and region are needed)')
+
+        parser.add_argument(
+            '--aws-instance-profile',
+            action='store_true',
+            help='Use the IAM role associated with this instance')
+
+        # REQUIRED ARGS
+
+        parser.add_argument(
+            '-c',
+            '--cluster',
+            help='Name of ECS cluster')
+
+        parser.add_argument(
+            '-i',
+            '--image',
+            help='Name of Docker image to run, ex: repo/image:latest\nFormat: [domain][:port][/repo][/][image][:tag]\nExamples: mariadb, mariadb:latest, silintl/mariadb,\nsilintl/mariadb:latest, private.registry.com:8000/repo/image:tag')
+
+        # OPTIONAL ARGUMENTS
+
+        parser.add_argument(
+            '-D',
+            '--desired-count',
+            type=int,
+            help='The number of instantiations of the task to place and keep running in your service.')
+
+        parser.add_argument(
+            '-m',
+            '--min',
+            type=int,
+            help='minumumHealthyPercent: The lower limit on the number of running tasks during a deployment.')
+
+        parser.add_argument(
+            '-M',
+            '--max',
+            type=int,
+            help='maximumPercent: The upper limit on the number of running tasks during a deployment.')
+
+        parser.add_argument(
+            '-t',
+            '--timeout',
+            help='Default is 90s. Script monitors ECS Service for new task definition to be running.')
+
+        parser.add_argument(
+            '-e',
+            '--tag-env-var',
+            help='Get image tag name from environment variable. If provided this will override value specified in image name argument.')
+
+        parser.add_argument(
+            '-v',
+            '--verbose',
+            action='store_true',
+            help='Verbose output')
+
+        parser.add_argument(
+            '--max-definitions',
+            type=int,
+            help='Number of Task Definition Revisions to persist before deregistering oldest revisions.')
+
+        args = parser.parse_args(sys.argv[1:])
+        return vars(args)
+
+
+
 if __name__ == "__main__":
-    main()
+    # main()
+    CLI()

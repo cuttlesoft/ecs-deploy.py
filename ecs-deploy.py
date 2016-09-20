@@ -11,7 +11,34 @@ import sys
 import json
 import argparse
 import boto3
+import pprint
 from botocore.exceptions import ClientError
+
+
+def get_service_something(service, cluster):
+    """
+    Gets info about service
+    """
+    try:
+        client = boto3.client('ecs')
+    except ClientError as err:
+        print("Failed to create boto3 client.\n" + str(err))
+        return False
+
+    try:
+        """
+        see all parameters here:
+        https://boto3.readthedocs.io/en/latest/reference/services/ecs.html#\
+        ECS.Client.describe_services
+        """
+        response = client.describe_services(
+            cluster=cluster,
+            services=[service]
+        )
+        return response
+    except ClientError as err:
+        print("Failed to retrieve task definition.\n" + str(err))
+        return False
 
 
 def get_task_definition(definition_name):
@@ -132,15 +159,25 @@ def main():
     # cluster = os.getenv('ECS_CLUSTER_NAME')
     # service = os.getenv('ECS_SERVICE_NAME')
     # family = os.getenv('ECS_TASK_FAMILY_NAME')
-    task_definition = get_task_definition(args.definition_name)
-    print(task_definition)
 
+    if args.definition_name:
+        task_definition = get_task_definition(args.definition_name)
+
+    elif args.service:
+        task_definition = get_service_something(args.service, args.cluster)['services'][0]['taskDefinition'].split('/')[1].split(':')[0]
+
+    else:
+        print('Fail')
+        sys.exit(1)
+
+    print(task_definition)
     task_definition = new_task_definition(task_definition, args.image)
     print(task_definition)
 
     if task_definition:
         if not update_service(args.cluster, args.service, args.definition_name):
             sys.exit(1)
+        # wait and make sure things worked
     else:
         sys.exit(1)
 

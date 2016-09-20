@@ -88,7 +88,7 @@ def new_task_definition(task_definition, image):
             family=family,
             containerDefinitions=task_definition['containerDefinitions']
         )
-        return response['taskDefinition']['taskDefinitionArn']
+        return response['taskDefinition']
     except ClientError as err:
         print("Failed to update the stack.\n" + str(err))
         return False
@@ -135,64 +135,17 @@ def update_service(cluster, service, task_definition):
         return False
 
 
-def main():
-    """
-    Your favorite wrapper's favorite wrapper
-    """
-    parser = argparse.ArgumentParser()
-    parser.add_argument("cluster",
-                        help="The AWS cluster")
-    parser.add_argument("service",
-                        help="The AWS Service")
-    parser.add_argument("definition_name",
-                        help="The name of the AWS Task Definition")
-    parser.add_argument("image",
-                        help="The Docker Image to be used in the Task")
-    # parser.add_argument("count",
-    #                     help="The desired number of Tasks to be running")
-    # parser.add_argument("min_healthy", help="The minimum number of healthy \
-    #                     containers that should be running on the cluster")
-    # parser.add_argument("max_healthy", help="The maximum number of healthy \
-    #                     containers that should be running on the cluster")
-    args = parser.parse_args()
-
-    # cluster = os.getenv('ECS_CLUSTER_NAME')
-    # service = os.getenv('ECS_SERVICE_NAME')
-    # family = os.getenv('ECS_TASK_FAMILY_NAME')
-
-    if args.definition_name:
-        task_definition = get_task_definition(args.definition_name)
-
-    elif args.service:
-        task_definition = get_service_something(args.service, args.cluster)['services'][0]['taskDefinition'].split('/')[1].split(':')[0]
-
-    else:
-        print('Fail')
-        sys.exit(1)
-
-    print(task_definition)
-    task_definition = new_task_definition(task_definition, args.image)
-    print(task_definition)
-
-    if task_definition:
-        if not update_service(args.cluster, args.service, args.definition_name):
-            sys.exit(1)
-        # wait and make sure things worked
-    else:
-        sys.exit(1)
-
-
 class CLI(object):
 
     def __init__(self):
         args = self._init_parser()
-        # print(args)
 
         if not (args.get('service_name') or args.get('task_definition')):
             print('Either "service-name" or "task-definition" is required.')
         else:
             print('Service name: %s' % args.get('service_name'))
             print('Task definition: %s' % args.get('task_definition'))
+            self._run_parser(args)
 
     def _init_parser(self):
         parser = argparse.ArgumentParser(
@@ -305,8 +258,26 @@ Optional:
         args = parser.parse_args(sys.argv[1:])
         return vars(args)
 
+    def _run_parser(self, args):
+        if not args.get('task_definition'):
+            name = get_service_something(args.get('service_name'), args.get('cluster'))['services'][0]['taskDefinition'].split('/')[1].split(':')[0]
+            print(name)
+            task_definition = get_task_definition(name)
+
+        else:
+            task_definition = get_task_definition(args.get('task_definition'))
+
+        print(task_definition)
+        task_definition = new_task_definition(task_definition, args.get('image'))
+        print(task_definition)
+
+        if task_definition:
+            if not update_service(args.get('cluster'), args.get('service_name'), args.get('task_definition')):
+                sys.exit(1)
+            # wait and make sure things worked
+        else:
+            sys.exit(1)
 
 
 if __name__ == "__main__":
-    # main()
     CLI()

@@ -155,20 +155,25 @@ def _run_parser(client, args):
             'services': [service_name],
             'cluster': cluster
         }
-        service = update_thing(client.describe_services, **kwargs)
+        service = client_fn(client.describe_services, **kwargs)
         arn = service['services'][0]['taskDefinition']
         task_definition_name = arn.split('/')[1].split(':')[0]
 
     kwargs = {
         'taskDefinition': task_definition_name
     }
-    task_definition = update_thing(client.describe_task_definition, **kwargs)['taskDefinition']
+    task_definition = client_fn(client.describe_task_definition, **kwargs)['taskDefinition']
+
+    # iteritems() in Python 2 == items() in Python 3
+    kwargs = {}
+    for arg_name, arg in args.iteritems():
+        kwargs[arg_name] = arg
 
     kwargs = {
         'family': task_definition['family'],
         'containerDefinitions': task_definition['containerDefinitions']
     }
-    new_task_definition = update_thing(client.register_task_definition, **kwargs)['taskDefinition']
+    new_task_definition = client_fn(client.register_task_definition, **kwargs)['taskDefinition']
 
     kwargs = {
         'cluster': cluster,
@@ -176,18 +181,21 @@ def _run_parser(client, args):
         'taskDefinition': new_task_definition['family']
     }
     if task_definition:
-        # print(update_thing(client.update_service, **kwargs)['service']['taskDefinition'])
-        if not update_thing(client.update_service, **kwargs):
+        # print(client_fn(client.update_service, **kwargs)['service']['taskDefinition'])
+        if not client_fn(client.update_service, **kwargs):
             sys.exit(1)
         # wait and make sure things worked
     else:
         sys.exit(1)
 
 
-def update_thing(func, **kwargs):
-    response = func(**kwargs)
-    return response
-
+def client_fn(func, **kwargs):
+    try:
+        response = func(**kwargs)
+        return response
+    except ClientError:
+        print('Shoot')
+        sys.exit(1)
 
 if __name__ == '__main__':
     main()

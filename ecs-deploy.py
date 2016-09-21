@@ -143,31 +143,18 @@ class CLI(object):
         self.task_definition_name = self._task_definition_name()
         self.service_name = self._service_name()
 
-        task_definition_kwargs = {'taskDefinition': self.task_definition_name}
-        task_definition = self.client_fn('describe_task_definition',
-                                         **task_definition_kwargs)['taskDefinition']
+        self.task_definition = self.client_fn('describe_task_definition')['taskDefinition']
+        self.new_task_definition = self.client_fn('register_task_definition')['taskDefinition']
 
-        # TODO: DO THIS RIGHT
-        # iteritems() in Python 2 == items() in Python 3
-        try:
-            given_args = {arg_name: arg for arg_name, arg in self.args.items() if arg}
-        except:
-            given_args = {arg_name: arg for arg_name, arg in self.args.iteritems() if arg}
+        # # TODO: DO THIS RIGHT
+        # # iteritems() in Python 2 == items() in Python 3
+        # try:
+        #     given_args = {arg_name: arg for arg_name, arg in self.args.items() if arg}
+        # except:
+        #     given_args = {arg_name: arg for arg_name, arg in self.args.iteritems() if arg}
 
-        register_kwargs = {
-            'family': task_definition['family'],
-            'containerDefinitions': task_definition['containerDefinitions']
-        }
-        new_task_definition = self.client_fn('register_task_definition', **register_kwargs)['taskDefinition']
-
-        update_kwargs = {
-            'cluster': self.cluster,
-            'service': self.service_name,
-            'taskDefinition': new_task_definition['family']
-        }
-        if task_definition:
-            # print(client_fn(client.update_service, **kwargs)['service']['taskDefinition'])
-            if not self.client_fn('update_service', **update_kwargs):
+        if self.task_definition:
+            if not self.client_fn('update_service'):
                 sys.exit(1)
             # wait and make sure things worked
         else:
@@ -175,44 +162,69 @@ class CLI(object):
 
     def _task_definition_name(self):
         if self.args.get('task_definition'):
-            task_definition_name = self.args.get('task_definition')
+            return self.args.get('task_definition')
 
-        elif self.args.get('service_name'):
-            kwargs = {
-                'services': [self.args.get('service_name')],
-                'cluster': self.cluster
-            }
-            service = self.client_fn('describe_services', **kwargs)
-            arn = service['services'][0]['taskDefinition']
-            task_definition_name = arn.split('/')[1].split(':')[0]
-
-        else:
-            # TODO: FAIL
-            pass
-
-        return task_definition_name
+        # use 'service_name' with describe_services() to get task definition
+        service = self.client_fn('describe_services')
+        arn = service['services'][0]['taskDefinition']
+        return arn.split('/')[1].split(':')[0]
 
     def _service_name(self):
         if self.args.get('service_name'):
-            service_name = self.args.get('service_name')
+            return self.args.get('service_name')
 
-        elif self.args.get('task_definition'):
-            kwargs = {'cluster': self.cluster}
-            # for service in services['serviceArns']:
-            #     if self.task_definition_name in service:
-            #         service_name = service.split('/')[1].split(':')[0]
-            serviceArns = self.client_fn('list_services', **kwargs)['serviceArns']
-            service = [s for s in serviceArns if self.task_definition_name in s][0]
-            service_name = service.split('/')[1].split(':')[0]
+        # use 'task_definition' with list_services() to get service name
+        serviceArns = self.client_fn('list_services')['serviceArns']
+        service = [s for s in serviceArns if self.task_definition_name in s][0]
+        return service.split('/')[1].split(':')[0]
 
-        else:
-            # TODO: FAIL
-            pass
+    def _arg_kwargs(self, kwargs, arg):
+        # add specified arg to kwargs if it exists, return kwargs
+        if self.args.get(arg):
+            kwargs[arg] = self.args.get(arg)
+        return kwargs
 
-        return service_name
+    def client_kwargs(self, fn):
+        kwargs = {}
 
-    def client_fn(self, fn, **kwargs):
+        if fn == 'list_services':
+            kwargs['cluster'] = self.cluster
+
+        elif fn == 'describe_services':
+            kwargs['cluster'] = self.cluster
+            kwargs['services'] = [self.args.get('service_name')]
+
+        elif fn == 'describe_task_definition':
+            kwargs['taskDefinition'] = self.task_definition_name
+
+        elif fn == 'register_task_definition':
+            kwargs['family'] = self.task_definition['family']
+            kwargs['containerDefinitions'] = self.task_definition['containerDefinitions']
+            # optional kwargs from args
+            if self.args.get('image'):
+                print(kwargs['containerDefinitions'])
+                kwargs['containerDefinitions'][0]['image'] = self.args.get('image')
+
+        elif fn == 'update_service':
+            kwargs['cluster'] = self.cluster
+            kwargs['service'] = self.service_name
+            kwargs['taskDefinition'] = self.new_task_definition['family']
+            # optional kwargs from args
+            deployment_configuration = {}
+            if self.args.get('min'):
+                deployment_configuration['minimumHealthyPercent'] = self.args.get('min')
+            if self.args.get('max'):
+                deployment_configuration['maximumPercent'] = self.args.get('max')
+            kwargs['deploymentConfiguration'] = deployment_configuration
+            kwargs = self._arg_kwargs(kwargs, 'desired_count')
+
+        return kwargs
+
+
+    def client_fn(self, fn, kwargs={}):
         try:
+            kwargs = kwargs or self.client_kwargs(fn)
+            print(kwargs)
             response = getattr(self.client, fn)(**kwargs)
             return response
 

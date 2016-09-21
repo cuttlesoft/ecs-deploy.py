@@ -17,7 +17,7 @@ from botocore.exceptions import ClientError
 class CLI(object):
     def __init__(self):
         # get args
-        args = self._init_parser()
+        self.args = self._init_parser()
 
         # init boto3 client
         try:
@@ -26,12 +26,12 @@ class CLI(object):
             print('Failed to create boto3 client.\n%s' % err)
             sys.exit(1)
 
-        if not (args.get('task_definition') or args.get('service_name')):
+        if not (self.args.get('task_definition') or self.args.get('service_name')):
             print('Either task-definition or service-name must be provided.')
             sys.exit(1)
 
         # run script
-        self._run_parser(args)
+        self._run_parser()
 
     def _init_parser(self):
         parser = argparse.ArgumentParser(
@@ -49,7 +49,6 @@ class CLI(object):
         parser.add_argument(
             '-d',
             '--task-definition',
-            nargs='?',
             help='Name of task definition to deploy (either task-definition or service-name is required)')
 
         # REQUIRED ARGS : AT LEAST SOMEWHERE
@@ -139,61 +138,103 @@ class CLI(object):
         args = parser.parse_args(sys.argv[1:])
         return vars(args)
 
-    def _run_parser(self, args):
-        cluster = args.get('cluster')
+    def _run_parser(self):
+        self.cluster = self.args.get('cluster')
+        self.task_definition_name = self._task_definition_name()
+        self.service_name = self._service_name()
 
-        if args.get('task_definition'):
-            task_definition_name = args.get('task_definition')
-            for service in self.client.list_services(cluster=cluster)['serviceArns']:
-                if task_definition_name in service:
-                    service_name = service.split('/')[1].split(':')[0]
+        # if self.args.get('task_definition'):
+        #     task_definition_name = self.args.get('task_definition')
+        #     for service in self.client.list_services(cluster=cluster)['serviceArns']:
+        #         if task_definition_name in service:
+        #             service_name = service.split('/')[1].split(':')[0]
 
-        elif args.get('service_name'):
-            service_name = args.get('service_name')
-            kwargs = {
-                'services': [service_name],
-                'cluster': cluster
-            }
-            service = self.client_fn('describe_services', **kwargs)
-            arn = service['services'][0]['taskDefinition']
-            task_definition_name = arn.split('/')[1].split(':')[0]
+        # elif self.args.get('service_name'):
+        #     service_name = self.args.get('service_name')
+        #     kwargs = {
+        #         'services': [service_name],
+        #         'cluster': cluster
+        #     }
+        #     service = self.client_fn('describe_services', **kwargs)
+        #     arn = service['services'][0]['taskDefinition']
+        #     task_definition_name = arn.split('/')[1].split(':')[0]
 
-        kwargs = {
-            'taskDefinition': task_definition_name
-        }
-        task_definition = self.client_fn('describe_task_definition', **kwargs)['taskDefinition']
+        task_definition_kwargs = {'taskDefinition': self.task_definition_name}
+        task_definition = self.client_fn('describe_task_definition',
+                                         **task_definition_kwargs)['taskDefinition']
 
         # iteritems() in Python 2 == items() in Python 3
         kwargs = {}
-        for arg_name, arg in args.iteritems():
+        for arg_name, arg in self.args.iteritems():
             kwargs[arg_name] = arg
 
-        print(task_definition['family'])
-        kwargs = {
+        register_kwargs = {
             'family': task_definition['family'],
             'containerDefinitions': task_definition['containerDefinitions']
         }
-        new_task_definition = self.client_fn('register_task_definition', **kwargs)['taskDefinition']
+        new_task_definition = self.client_fn('register_task_definition', **register_kwargs)['taskDefinition']
 
-        kwargs = {
-            'cluster': cluster,
-            'service': service_name,
+        update_kwargs = {
+            'cluster': self.cluster,
+            'service': self.service_name,
             'taskDefinition': new_task_definition['family']
         }
         if task_definition:
             # print(client_fn(client.update_service, **kwargs)['service']['taskDefinition'])
-            if not self.client_fn('update_service', **kwargs):
+            if not self.client_fn('update_service', **update_kwargs):
                 sys.exit(1)
             # wait and make sure things worked
         else:
             sys.exit(1)
 
-    def client_fn(self, func, **kwargs):
+    def _task_definition_name(self):
+        if self.args.get('task_definition'):
+            task_definition_name = self.args.get('task_definition')
+
+        elif self.args.get('service_name'):
+            kwargs = {
+                'services': [self.args.get('service_name')],
+                'cluster': self.cluster
+            }
+            service = self.client_fn('describe_services', **kwargs)
+            arn = service['services'][0]['taskDefinition']
+            task_definition_name = arn.split('/')[1].split(':')[0]
+
+        else:
+            # TODO: FAIL
+            pass
+
+        return task_definition_name
+
+    def _service_name(self):
+        if self.args.get('service_name'):
+            service_name = self.args.get('service_name')
+
+        elif self.args.get('task_definition'):
+            kwargs = {'cluster': self.cluster}
+            # for service in services['serviceArns']:
+            #     if self.task_definition_name in service:
+            #         service_name = service.split('/')[1].split(':')[0]
+            serviceArns = self.client_fn('list_services', **kwargs)['serviceArns']
+            service = [s for s in serviceArns if self.task_definition_name in s][0]
+            service_name = service.split('/')[1].split(':')[0]
+
+        else:
+            # TODO: FAIL
+            pass
+
+        return service_name
+
+    def client_fn(self, fn, **kwargs):
         try:
-            response = getattr(self.client, func)(**kwargs)
+            response = getattr(self.client, fn)(**kwargs)
             return response
-        except ClientError:
-            print('Shoot')
+
+        except ClientError as e:
+            print('ClientError: %s' % e)
+            sys.exit(1)
+        except Exception as e:
+            print('Exception: %s' % e)
             sys.exit(1)
 
 if __name__ == '__main__':

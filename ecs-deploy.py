@@ -156,7 +156,10 @@ class CLI(object):
         if self.task_definition:
             if not self.client_fn('update_service'):
                 sys.exit(1)
-            # wait and make sure things worked
+
+            # loop for desired timeout
+            print(self.client_fn('list_tasks'))
+
         else:
             sys.exit(1)
 
@@ -217,6 +220,11 @@ class CLI(object):
                 deployment_configuration['maximumPercent'] = self.args.get('max')
             kwargs['deploymentConfiguration'] = deployment_configuration
             kwargs = self._arg_kwargs(kwargs, 'desired_count')
+
+        elif fn == 'list_tasks':
+            kwargs['cluster'] = self.cluster
+            kwargs['serviceName'] = self.service_name
+            kwargs['desiredStatus'] = 'RUNNING'
 
         return kwargs
 

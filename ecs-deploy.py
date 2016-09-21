@@ -21,7 +21,13 @@ class CLI(object):
 
         # init boto3 client
         try:
-            self.client = boto3.client('ecs')
+            # optional aws credentials overrides
+            credentials = {}
+            credentials = self._arg_kwargs(credentials, 'aws_access_key', 'aws_access_key_id')
+            credentials = self._arg_kwargs(credentials, 'aws_secret_key', 'aws_secret_access_key')
+            credentials = self._arg_kwargs(credentials, 'aws_region', 'region')
+            # init boto3 ecs client
+            self.client = boto3.client('ecs', **credentials)
         except ClientError as err:
             print('Failed to create boto3 client.\n%s' % err)
             sys.exit(1)
@@ -146,13 +152,6 @@ class CLI(object):
         self.task_definition = self.client_fn('describe_task_definition')['taskDefinition']
         self.new_task_definition = self.client_fn('register_task_definition')['taskDefinition']
 
-        # # TODO: DO THIS RIGHT
-        # # iteritems() in Python 2 == items() in Python 3
-        # try:
-        #     given_args = {arg_name: arg for arg_name, arg in self.args.items() if arg}
-        # except:
-        #     given_args = {arg_name: arg for arg_name, arg in self.args.iteritems() if arg}
-
         if self.task_definition:
             if not self.client_fn('update_service'):
                 sys.exit(1)
@@ -178,10 +177,11 @@ class CLI(object):
         service = [s for s in serviceArns if self.task_definition_name in s][0]
         return service.split('/')[1].split(':')[0]
 
-    def _arg_kwargs(self, kwargs, arg):
+    def _arg_kwargs(self, kwargs, arg_name, alt_name=None):
         # add specified arg to kwargs if it exists, return kwargs
-        if self.args.get(arg):
-            kwargs[arg] = self.args.get(arg)
+        if self.args.get(arg_name):
+            kwarg_name = alt_name or arg_name
+            kwargs[kwarg_name] = self.args.get(arg_name)
         return kwargs
 
     def client_kwargs(self, fn):
@@ -202,7 +202,6 @@ class CLI(object):
             kwargs['containerDefinitions'] = self.task_definition['containerDefinitions']
             # optional kwargs from args
             if self.args.get('image'):
-                print(kwargs['containerDefinitions'])
                 kwargs['containerDefinitions'][0]['image'] = self.args.get('image')
 
         elif fn == 'update_service':
@@ -210,21 +209,17 @@ class CLI(object):
             kwargs['service'] = self.service_name
             kwargs['taskDefinition'] = self.new_task_definition['family']
             # optional kwargs from args
-            deployment_configuration = {}
-            if self.args.get('min'):
-                deployment_configuration['minimumHealthyPercent'] = self.args.get('min')
-            if self.args.get('max'):
-                deployment_configuration['maximumPercent'] = self.args.get('max')
-            kwargs['deploymentConfiguration'] = deployment_configuration
+            deployment_config = {}
+            deployment_config = self._arg_kwargs(deployment_config, 'min', 'minimumHealthyPercent')
+            deployment_config = self._arg_kwargs(deployment_config, 'max', 'maximumPercent')
+            kwargs['deploymentConfiguration'] = deployment_config
             kwargs = self._arg_kwargs(kwargs, 'desired_count')
 
         return kwargs
 
-
-    def client_fn(self, fn, kwargs={}):
+    def client_fn(self, fn):
         try:
-            kwargs = kwargs or self.client_kwargs(fn)
-            print(kwargs)
+            kwargs = self.client_kwargs(fn)
             response = getattr(self.client, fn)(**kwargs)
             return response
 

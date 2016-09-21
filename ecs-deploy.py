@@ -143,30 +143,16 @@ class CLI(object):
         self.task_definition_name = self._task_definition_name()
         self.service_name = self._service_name()
 
-        # if self.args.get('task_definition'):
-        #     task_definition_name = self.args.get('task_definition')
-        #     for service in self.client.list_services(cluster=cluster)['serviceArns']:
-        #         if task_definition_name in service:
-        #             service_name = service.split('/')[1].split(':')[0]
-
-        # elif self.args.get('service_name'):
-        #     service_name = self.args.get('service_name')
-        #     kwargs = {
-        #         'services': [service_name],
-        #         'cluster': cluster
-        #     }
-        #     service = self.client_fn('describe_services', **kwargs)
-        #     arn = service['services'][0]['taskDefinition']
-        #     task_definition_name = arn.split('/')[1].split(':')[0]
-
         task_definition_kwargs = {'taskDefinition': self.task_definition_name}
         task_definition = self.client_fn('describe_task_definition',
                                          **task_definition_kwargs)['taskDefinition']
 
+        # TODO: DO THIS RIGHT
         # iteritems() in Python 2 == items() in Python 3
-        kwargs = {}
-        for arg_name, arg in self.args.iteritems():
-            kwargs[arg_name] = arg
+        try:
+            given_args = {arg_name: arg for arg_name, arg in self.args.items() if arg}
+        except:
+            given_args = {arg_name: arg for arg_name, arg in self.args.iteritems() if arg}
 
         register_kwargs = {
             'family': task_definition['family'],

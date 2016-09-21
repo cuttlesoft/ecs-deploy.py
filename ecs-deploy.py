@@ -145,10 +145,14 @@ def _run_parser(client, args):
 
     if args.get('task_definition'):
         task_definition_name = args.get('task_definition')
+        for service in client.list_services(cluster=cluster)['serviceArns']:
+            if task_definition_name in service:
+                service_name = service.split('/')[1].split(':')[0]
 
     elif args.get('service_name'):
+        service_name = args.get('service_name')
         kwargs = {
-            'services': [args.get('service_name')],
+            'services': [service_name],
             'cluster': cluster
         }
         service = update_thing(client.describe_services, **kwargs)
@@ -160,20 +164,16 @@ def _run_parser(client, args):
     }
     task_definition = update_thing(client.describe_task_definition, **kwargs)['taskDefinition']
 
-    for service in client.list_services(cluster=cluster)['serviceArns']:
-        if task_definition['family'] in service:
-            service_name = service.split('/')[1].split(':')[0]
-
     kwargs = {
         'family': task_definition['family'],
         'containerDefinitions': task_definition['containerDefinitions']
     }
-    task_definition = update_thing(client.register_task_definition, **kwargs)['taskDefinition']
+    new_task_definition = update_thing(client.register_task_definition, **kwargs)['taskDefinition']
 
     kwargs = {
         'cluster': cluster,
         'service': service_name,
-        'taskDefinition': task_definition['family']
+        'taskDefinition': new_task_definition['family']
     }
     if task_definition:
         # print(update_thing(client.update_service, **kwargs)['service']['taskDefinition'])

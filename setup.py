@@ -12,15 +12,15 @@ def get_requirements(suffix=''):
 
 
 class PyTest(TestCommand):
-    test_package_name = 'ecs-deploy.py'
+    test_package_name = 'ecs_deploy.py'
 
     def finalize_options(self):
         TestCommand.finalize_options(self)
         _test_args = [
             '--verbose',
             '--ignore=build',
-            '--cov={0}'.format(self.test_package_name),
-            '--cov-report=term-missing',
+            '--cov', 'ecs_deploy.py',
+            '--cov-report', 'term-missing',
             '--pep8',
             '--cache-clear'
         ]

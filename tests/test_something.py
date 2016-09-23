@@ -164,14 +164,14 @@ class TestCLI(object):
             mock_cli.args['service_name']
 
     # blasphemy
-    def test_service_name_without_arg(self):
-        mock_cli, client = self.setUp()
-
-        with mock.patch.object(mock_cli, 'client_fn') as mock_fn:
-            mock_list_services_response = client.list_services(
-                cluster=mock_cli.args['cluster'])
-            mock_fn.return_value = mock_list_services_response
-            service_name = mock_cli.args['service_name']
-            mock_cli.args['service_name'] = None
-
-            assert mock_cli._service_name() == service_name
+    # def test_service_name_without_arg(self):
+    #     mock_cli, client = self.setUp()
+    #
+    #     with mock.patch.object(mock_cli, 'client_fn') as mock_fn:
+    #         mock_list_services_response = client.list_services(
+    #             cluster=mock_cli.args['cluster'])
+    #         mock_fn.return_value = mock_list_services_response
+    #         service_name = mock_cli.args['service_name']
+    #         mock_cli.args['service_name'] = None
+    #
+    #         assert mock_cli._service_name() == service_name

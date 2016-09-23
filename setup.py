@@ -55,12 +55,6 @@ class PyTest(TestCommand):
         sys.exit(errno)
 
 
-tests_require = [
-    'pytest-pep8',
-    'pytest-cov',
-    get_requirements('-dev')
-]
-
 extra = {}
 if sys.version_info >= (3,):
     extra['use_2to3'] = True
@@ -68,15 +62,19 @@ if sys.version_info >= (3,):
 setup(
     name='ecs-deploy',
     version='0.1.0',
-    url='http://github.com/cuttlesoft/flask-bitmapist',
-    download_url='https://github.com/cuttlesoft/flask-bitmapist/tarball/0.1.0',
+    url='http://github.com/cuttlesoft/ecs-deploy',
+    download_url='https://github.com/cuttlesoft/ecs-deploy/tarball/0.1.0',
     license='MIT',
     author='Cuttlesoft, LLC',
     author_email='engineering@cuttlesoft.com',
+    # description='Flask extension that creates a simple interface to \
+    #    Bitmapist analytics library',
+    # long_description=open('README.md').read() + '\n\n' + \
+    #    open('HISTORY.rst').read(),
     packages=find_packages(),
     zip_safe=False,
     platforms='any',
-    tests_require=tests_require,
+    # tests_require=get_requirements('-dev'),
     cmdclass={'test': PyTest},
     classifiers=[
         'Development Status :: 3 - Alpha',

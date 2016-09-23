@@ -1,7 +1,9 @@
 .DS_Store
 *.pyc
-.tox/*
-.cache/*
+.tox/
+.cache
 .eggs/*
-*.egg-info/*
+*.egg-info/
 */__pycache__/*
+.coverage
+.coverage.*

@@ -10,5 +10,4 @@ branches:
   only:
   - master
   - travis
-script: py.test \
-  --basetemp={envtmpdir} {posargs}
+script: py.test 

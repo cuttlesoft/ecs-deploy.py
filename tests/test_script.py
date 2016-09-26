@@ -14,7 +14,7 @@ class TestCLI(object):
             mock_init.return_value = None
             self.mock_cli = CLI()
 
-        self.client = boto3.client('ecs')
+        self.client = boto3.client('ecs', region_name='us-east-1')
 
         mock_cluster = self.client.create_cluster(clusterName='mock_cluster')
 

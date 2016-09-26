@@ -67,14 +67,13 @@ setup(
     license='MIT',
     author='Cuttlesoft, LLC',
     author_email='engineering@cuttlesoft.com',
-    # description='Flask extension that creates a simple interface to \
-    #    Bitmapist analytics library',
-    # long_description=open('README.md').read() + '\n\n' + \
-    #    open('HISTORY.rst').read(),
+    description='Python script to instigate an automatic blue/green \
+    deployment using Task Definition and Service entities in Amazon\'s ECS',
+    # long_description=open('README.md').read() + '\n\n' +
+    # open('HISTORY.rst').read(),
     packages=find_packages(),
     zip_safe=False,
     platforms='any',
-    # tests_require=get_requirements('-dev'),
     cmdclass={'test': PyTest},
     classifiers=[
         'Development Status :: 3 - Alpha',

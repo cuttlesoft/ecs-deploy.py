@@ -11,4 +11,4 @@ branches:
   - travis
 install:
   - pip install -r requirements-dev.txt
-script: py.test
+script: py.test --cov ecs_deploy.py --cov-report term-missing --pep8

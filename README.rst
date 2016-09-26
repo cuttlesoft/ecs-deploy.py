@@ -89,6 +89,10 @@ container images, which are then pushed into a repository (public or private), t
 script therefore uses the specified image parameter as a modification key to change the tag used by a container's image. It \
 looks for images with the same repository name as the specified parameter, and updates its tag to the one in the specified parameter.
 
+This script inspired by: SIL International's `ecs-deploy`_.
+
+.. _ecs-deploy: https://github.com/silinternational/ecs-deploy
+
 Contributing
 ------------
 If you're interested in contributing to ecs-deploy.py, get started by creating an issue `here`_. Thanks!

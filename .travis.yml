@@ -10,4 +10,6 @@ branches:
   only:
   - master
   - travis
-script: py.test 
+install:
+  - pip install -r requirements-dev.txt
+script: py.test

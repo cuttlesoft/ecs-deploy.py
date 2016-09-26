@@ -163,7 +163,7 @@ class TestCLI(object):
         assert mock_cli._service_name() == \
             mock_cli.args['service_name']
 
-    # blasphemy
+    # TODO: mock this out with proper args
     # def test_service_name_without_arg(self):
     #     mock_cli, client = self.setUp()
     #

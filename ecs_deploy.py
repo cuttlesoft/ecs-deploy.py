@@ -209,7 +209,8 @@ class CLI(object):
 
         # use 'task_definition' with list_services() to get service name
         serviceArns = self.client_fn('list_services')['serviceArns']
-        service = [s for s in serviceArns if self.task_definition_name in s][0]
+        service = [s for s in serviceArns if self.args.get('task_definition')
+                   in s][0]
         return service.split('/')[1].split(':')[0]
 
     def _arg_kwargs(self, kwargs, arg_name, alt_name=None):

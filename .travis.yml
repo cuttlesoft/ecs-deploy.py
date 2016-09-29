@@ -1,14 +1,22 @@
 language: python
 python:
-  - "2.6"
-  - "2.7"
-  - "3.3"
-  - "3.4"
-  - "3.5"
+- '2.6'
+- '2.7'
+- '3.3'
+- '3.4'
+- '3.5'
 branches:
   only:
   - master
   - travis
 install:
-  - pip install -r requirements-dev.txt
+- pip install -r requirements-dev.txt
 script: py.test --cov ecs_deploy.py --cov-report term-missing --pep8
+deploy:
+  provider: pypi
+  user: cuttlesoft
+  password:
+    secure: maqAJdwwE5fJ1rc0H/lggFqx9UCOXgOvUYApEzAv8GpRBoxduHzq4z2KxlI1BaQH8WBEGWWAgJ73kvMQIPmgQ6un4AxhS4+N1T9R7FYpCxjdmRYFswa8wtZ++VVkOkU37npk0OnlsQcevM8+WtFG0Eop7Qg0jJsL1zNZNXPfq+lWpkB17l292gzAHrI3G3NiyJvIugebXucv248HHQTX9h4kyy4PnZASQA4jfViScmhdYocc4djMwSZ6RfJgClCR8/euT81U2Cqr27IZXNIFg5x3AKJnvcbSDzypxH09IRYVx4Ib5YnKvkm8keCXwjTm08Mb2KxHzuHrrWVJE3YGOuNcOek3bdb8mQpi5tlhMPr0BVtjhjdG6lz0y5+aIyJv4X24+I99Xpy6ADNkLryFmrLi+H8lQ0Cz5VQ0LykZDsilmYmXkBwkAzqGVXkUxARZo/7czUqD3eRVHSHKqUBukGUm2jcCv3BaXtWWLFMkSthL7b089+cmMRZ+BsTp9h3yQquGpiZVB7VWR+LeDl53tSm9oZyoBAHFx6ObUNcRO3/7y94MBmRUvxPelwg1WVyK+FYZnEVKoI3k01PnM68LXJcG1NuQCodTr1AkibfDXyin7Nt7aRpOb0MpLYUBAzjZZVS++10uh77rcTEmNsCvvDn9vftKOGArGOgMjdYZosE=
+  on:
+    tags: true
+    repo: cuttlesoft/ecs-deploy.py

@@ -69,8 +69,7 @@ setup(
     author_email='engineering@cuttlesoft.com',
     description='Python script to instigate an automatic blue/green \
     deployment using Task Definition and Service entities in Amazon\'s ECS',
-    long_description=open('README.rst').read() + '\n\n' +
-    # open('HISTORY.rst').read(),
+    long_description=open('README.rst').read(),
     packages=find_packages(),
     zip_safe=False,
     platforms='any',

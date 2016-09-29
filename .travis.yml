@@ -8,6 +8,7 @@ python:
 branches:
   only:
   - master
+  - release
   - travis
 install:
 - pip install -r requirements-dev.txt

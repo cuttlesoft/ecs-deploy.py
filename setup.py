@@ -60,16 +60,16 @@ if sys.version_info >= (3,):
     extra['use_2to3'] = True
 
 setup(
-    name='ecs-deploy',
+    name='ecs-deploy-py',
     version='0.1.0',
-    url='http://github.com/cuttlesoft/ecs-deploy',
-    download_url='https://github.com/cuttlesoft/ecs-deploy/tarball/0.1.0',
+    url='http://github.com/cuttlesoft/ecs-deploy.py',
+    download_url='https://github.com/cuttlesoft/ecs-deploy.py/tarball/0.1.0',
     license='MIT',
     author='Cuttlesoft, LLC',
     author_email='engineering@cuttlesoft.com',
     description='Python script to instigate an automatic blue/green \
     deployment using Task Definition and Service entities in Amazon\'s ECS',
-    # long_description=open('README.md').read() + '\n\n' +
+    long_description=open('README.rst').read() + '\n\n' +
     # open('HISTORY.rst').read(),
     packages=find_packages(),
     zip_safe=False,

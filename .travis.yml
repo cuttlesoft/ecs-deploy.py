@@ -12,6 +12,7 @@ branches:
   - travis
 install:
 - pip install -r requirements-dev.txt
+- pip install coveralls
 script: py.test --cov ecs_deploy.py --cov-report term-missing --pep8
 after_success:
 - coveralls

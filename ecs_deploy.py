@@ -6,9 +6,7 @@
 """
 
 from __future__ import print_function
-import os
 import sys
-import json
 import time
 import argparse
 import boto3

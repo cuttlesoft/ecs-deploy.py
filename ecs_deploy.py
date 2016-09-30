@@ -178,7 +178,7 @@ class CLI(object):
                 sys.exit(1)
 
             # loop for desired timeout
-            timeout = time.time() + 90
+            timeout = self.args.get('timeout') or time.time() + 90
             while True:
                 updated = False
                 running_tasks = self.client_fn('describe_tasks')['tasks']
@@ -187,9 +187,9 @@ class CLI(object):
                             self.new_task_definition['taskDefinitionArn']:
                         print('SUCCESS')
                         updated = True
-                time.sleep(1)
                 if updated or time.time() > timeout:
                     sys.exit(1)
+                time.sleep(1)
 
         else:
             sys.exit(1)

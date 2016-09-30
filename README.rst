@@ -2,6 +2,9 @@
 ecs-deploy.py
 =============
 
+.. image:: https://img.shields.io/pypi/v/ecs-deploy-py.svg
+    :target: https://pypi.python.org/pypi/ecs-deploy-py
+
 .. image:: https://travis-ci.org/cuttlesoft/ecs-deploy.py.svg?branch=master
 	:target: https://travis-ci.org/cuttlesoft/ecs-deploy.py
 
@@ -26,8 +29,7 @@ Usage
 		 -c | --cluster               Name of ECS cluster
 		 -i | --image                 Name of Docker image to run, ex: repo/image:latest
 																	Format: [domain][:port][/repo][/][image][:tag]
-																	Examples: mariadb, mariadb:latest, silintl/mariadb,
-																						silintl/mariadb:latest, private.registry.com:8000/repo/image:tag
+																	Examples: mariadb, mariadb:latest, silintl/mariadb, silintl/mariadb:latest, private.registry.com:8000/repo/image:tag
 	Optional arguments:
 		 -D | --desired-count    The number of instantiations of the task to place and keep running in your service.
 		 -m | --min              minumumHealthyPercent: The lower limit on the number of running tasks during a deployment.

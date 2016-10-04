@@ -12,14 +12,14 @@ def get_requirements(suffix=''):
 
 
 class PyTest(TestCommand):
-    test_package_name = 'ecs_deploy.py'
+    test_package_name = 'ecs_deploy'
 
     def finalize_options(self):
         TestCommand.finalize_options(self)
         _test_args = [
             '--verbose',
             '--ignore=build',
-            '--cov', 'ecs_deploy.py',
+            '--cov', 'ecs_deploy',
             '--cov-report', 'term-missing',
             '--pep8',
             '--cache-clear'
@@ -72,6 +72,7 @@ setup(
     long_description=open('README.rst').read() + '\n\n',
     # open('HISTORY.rst').read(),
     packages=find_packages(),
+    py_modules=['ecs_deploy'],
     zip_safe=False,
     platforms='any',
     install_requires=get_requirements(),
@@ -84,5 +85,10 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
-        'Topic :: Software Development :: Libraries :: Python Modules']
+        'Topic :: Software Development :: Libraries :: Python Modules'],
+    entry_points={
+        'console_scripts': [
+           'ecs-deploy-py = ecs_deploy:CLI'
+        ]
+    }
 )

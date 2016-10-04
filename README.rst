@@ -13,6 +13,14 @@ Python script to instigate an automatic blue/green deployment using the Task Def
 Usage
 -----
 
+The script is installed as an executable with::
+
+		$ pip install ecs-deploy-py
+
+To run the script::
+
+		$ ecs-deploy-py <args>
+
 .. code-block::
 
 	Either one of the following is required:
@@ -39,15 +47,15 @@ Usage
     Examples:
     Simple (Using env vars for AWS settings):
 
-    	$ python ecs-deploy.py -c production1 -n doorman-service -i docker.repo.com/doorman:latest
+    	$ ecs-deploy-py -c production1 -n doorman-service -i docker.repo.com/doorman:latest
 
     All options:
 
-    	$ python ecs-deploy.py -k ABC123 -s SECRETKEY -r us-east-1 -c production1 -n doorman-service -i docker.repo.com/doorman -m 50 -M 100 -t 240 -D 2 -v
+    	$ ecs-deploy-py -k ABC123 -s SECRETKEY -r us-east-1 -c production1 -n doorman-service -i docker.repo.com/doorman -m 50 -M 100 -t 240 -D 2 -v
 
     Using profiles (for STS delegated credentials, for instance):
 
-    	$ python ecs-deploy.py -p PROFILE -c production1 -n doorman-service -i docker.repo.com/doorman -m 50 -M 100 -t 240 -v
+    	$ ecs-deploy-py -p PROFILE -c production1 -n doorman-service -i docker.repo.com/doorman -m 50 -M 100 -t 240 -v
 
     Notes:
     	- If a tag is not found in image, it will default the tag to "latest"

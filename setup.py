@@ -10,8 +10,8 @@ from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 
 
-def get_requirements():
-    with open('ecs_deploy_py.egg_info/requires.txt') as f:
+def get_requirements(suffix=''):
+    with open('requirements%s.txt' % suffix) as f:
         rv = f.read().splitlines()
     return rv
 

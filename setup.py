@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+"""
+    setup.py
+    ~~~~
+"""
 import sys
 import os
 
@@ -12,14 +17,14 @@ def get_requirements(suffix=''):
 
 
 class PyTest(TestCommand):
-    test_package_name = 'ecs_deploy.py'
+    test_package_name = 'ecs_deploy'
 
     def finalize_options(self):
         TestCommand.finalize_options(self)
         _test_args = [
             '--verbose',
             '--ignore=build',
-            '--cov', 'ecs_deploy.py',
+            '--cov', 'ecs_deploy',
             '--cov-report', 'term-missing',
             '--pep8',
             '--cache-clear'
@@ -69,10 +74,12 @@ setup(
     author_email='engineering@cuttlesoft.com',
     description='Python script to instigate an automatic blue/green \
     deployment using Task Definition and Service entities in Amazon\'s ECS',
-    long_description=open('README.rst').read(),
+    long_description=open('README.rst').read() + '\n\n',
     packages=find_packages(),
+    py_modules=['ecs_deploy'],
     zip_safe=False,
     platforms='any',
+    install_requires=get_requirements(),
     cmdclass={'test': PyTest},
     classifiers=[
         'Development Status :: 3 - Alpha',
@@ -82,5 +89,10 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
-        'Topic :: Software Development :: Libraries :: Python Modules']
+        'Topic :: Software Development :: Libraries :: Python Modules'],
+    entry_points={
+        'console_scripts': [
+            'ecs-deploy-py = ecs_deploy:CLI'
+        ]
+    }
 )

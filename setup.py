@@ -66,9 +66,9 @@ if sys.version_info >= (3,):
 
 setup(
     name='ecs-deploy-py',
-    version='0.1.1',
+    version='0.1.2',
     url='http://github.com/cuttlesoft/ecs-deploy.py',
-    download_url='https://github.com/cuttlesoft/ecs-deploy.py/tarball/0.1.0',
+    download_url='https://github.com/cuttlesoft/ecs-deploy.py/tarball/0.1.2',
     license='MIT',
     author='Cuttlesoft, LLC',
     author_email='engineering@cuttlesoft.com',
@@ -80,6 +80,9 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=get_requirements(),
+    package_data={
+        '': ['*.txt']
+    },
     cmdclass={'test': PyTest},
     classifiers=[
         'Development Status :: 3 - Alpha',

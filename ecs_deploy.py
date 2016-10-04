@@ -6,6 +6,7 @@
 """
 
 from __future__ import print_function
+
 import sys
 import time
 import argparse
@@ -22,19 +23,17 @@ class CLI(object):
         try:
             # optional aws credentials overrides
             credentials = {}
-            credentials = self._arg_kwargs(credentials, 'aws_access_key',
-                                           'aws_access_key_id')
-            credentials = self._arg_kwargs(credentials, 'aws_secret_key',
-                                           'aws_secret_access_key')
+            credentials = self._arg_kwargs(credentials, 'aws_access_key', 'aws_access_key_id')
+            credentials = self._arg_kwargs(credentials, 'aws_secret_key', 'aws_secret_access_key')
             credentials = self._arg_kwargs(credentials, 'aws_region', 'region')
+
             # init boto3 ecs client
             self.client = boto3.client('ecs', **credentials)
         except ClientError as err:
             print('Failed to create boto3 client.\n%s' % err)
             sys.exit(1)
 
-        if not (self.args.get('task_definition') or
-                self.args.get('service_name')):
+        if not (self.args.get('task_definition') or self.args.get('service_name')):
             print('Either task-definition or service-name must be provided.')
             sys.exit(1)
 
@@ -43,17 +42,12 @@ class CLI(object):
 
     def _init_parser(self):
         parser = argparse.ArgumentParser(
-            description='AWS ECS Deployment Script',
-            usage='''ecs-deploy.py [<args>]
-            ''')
-
-        # REQUIRED ARGS : AT LEAST ONE
+            description='AWS ECS Deployment Script', usage='ecs-deploy.py [<args>]')
 
         parser.add_argument(
             '-n',
             '--service-name',
-            help='Name of service to deploy (either service-name or \
-                task-definition is required)')
+            help='Name of service to deploy (either service-name or task-definition is required)')
 
         parser.add_argument(
             '-d',
@@ -61,13 +55,17 @@ class CLI(object):
             help='Name of task definition to deploy (either task-definition \
                 or service-name is required)')
 
-        # REQUIRED ARGS : AT LEAST SOMEWHERE
+        # REQUIRED ARGUMENTS
+        parser.add_argument(
+            '-c',
+            '--cluster',
+            required=True,
+            help='Name of ECS cluster')
 
         parser.add_argument(
             '-k',
             '--aws-access-key',
-            help='AWS Access Key ID. May also be set as environment variable \
-                AWS_ACCESS_KEY_ID')
+            help='AWS Access Key ID. May also be set as environment variable AWS_ACCESS_KEY_ID')
 
         parser.add_argument(
             '-s',
@@ -78,11 +76,9 @@ class CLI(object):
         parser.add_argument(
             '-r',
             '--region',
-            help='AWS Region Name. May also be set as environment variable \
-                AWS_DEFAULT_REGION')
+            help='AWS Region Name. May also be set as environment variable AWS_DEFAULT_REGION')
 
         # REQUIRED ARGS : MAYBE NOT REQUIRED
-
         parser.add_argument(
             '-p',
             '--profile',
@@ -94,14 +90,6 @@ class CLI(object):
             action='store_true',
             help='Use the IAM role associated with this instance')
 
-        # REQUIRED ARGS
-
-        parser.add_argument(
-            '-c',
-            '--cluster',
-            required=True,
-            help='Name of ECS cluster')
-
         parser.add_argument(
             '-i',
             '--image',
@@ -112,7 +100,6 @@ class CLI(object):
                 private.registry.com:8000/repo/image:tag')
 
         # OPTIONAL ARGUMENTS
-
         parser.add_argument(
             '-D',
             '--desired-count',
@@ -166,10 +153,8 @@ class CLI(object):
         self.task_definition_name = self._task_definition_name()
         self.service_name = self._service_name()
 
-        self.task_definition = \
-            self.client_fn('describe_task_definition')['taskDefinition']
-        self.new_task_definition = \
-            self.client_fn('register_task_definition')['taskDefinition']
+        self.task_definition = self.client_fn('describe_task_definition')['taskDefinition']
+        self.new_task_definition = self.client_fn('register_task_definition')['taskDefinition']
 
         if self.task_definition:
             if not self.client_fn('update_service'):
@@ -181,12 +166,10 @@ class CLI(object):
                 updated = False
                 running_tasks = self.client_fn('describe_tasks')['tasks']
                 for task in running_tasks:
-                    if task['taskDefinitionArn'] == \
-                            self.new_task_definition['taskDefinitionArn']:
-                        print('SUCCESS')
+                    if task['taskDefinitionArn'] == self.new_task_definition['taskDefinitionArn']:
                         updated = True
                 if updated or time.time() > timeout:
-                    sys.exit(1)
+                    sys.exit(0)
                 time.sleep(1)
 
         else:
@@ -233,12 +216,10 @@ class CLI(object):
 
         elif fn == 'register_task_definition':
             kwargs['family'] = self.task_definition['family']
-            kwargs['containerDefinitions'] = \
-                self.task_definition['containerDefinitions']
+            kwargs['containerDefinitions'] = self.task_definition['containerDefinitions']
             # optional kwargs from args
             if self.args.get('image'):
-                kwargs['containerDefinitions'][0]['image'] = \
-                    self.args.get('image')
+                kwargs['containerDefinitions'][0]['image'] = self.args.get('image')
 
         elif fn == 'update_service':
             kwargs['cluster'] = self.cluster

@@ -1,4 +1,3 @@
-import pytest
 import mock
 import boto3
 from moto import mock_ecs
@@ -20,8 +19,7 @@ class TestCLI(object):
 
         mock_task = self.client.register_task_definition(
             family='mock_task',
-            taskRoleArn='arn:aws:ecs:us-east-1:999999999999:task-definition/ \
-                mock_task:99',
+            taskRoleArn='arn:aws:ecs:us-east-1:999999999999:task-definition/mock_task:99',
             networkMode='none',
             containerDefinitions=[
                 {
@@ -113,14 +111,13 @@ class TestCLI(object):
                     }
                 },
             ]
-            )
+        )
 
-        mock_service = self.client.create_service(cluster='mock_cluster',
-                                                  serviceName='mock_task' +
-                                                  '-service',
-                                                  taskDefinition='mock_task',
-                                                  desiredCount=1
-                                                  )
+        mock_service = self.client.create_service(
+            cluster='mock_cluster',
+            serviceName='mock_task-service',
+            taskDefinition='mock_task',
+            desiredCount=1)
 
         self.mock_cli.args = {
             'cluster': mock_cluster['cluster']['clusterName'],
@@ -359,11 +356,11 @@ class TestCLI(object):
                 mock_cli.args['cluster']
             assert mock_kwargs['tasks'] == mock_list_tasks_response['taskArns']
 
-    def test_client_kwargs_with_describe_tasks(self):
+    def test_client_kwargs_with_list_services_deux(self):
         mock_cli, client = self.setUp()
         mock_cli.client = client
 
-        with mock.patch.object(client, 'list_services',
-                               return_value={'key': 'value'}) as mock_client:
+        with mock.patch.object(
+                client, 'list_services', return_value={'key': 'value'}) as mock_client:
             mock_cli.client_fn('list_services')
             mock_client.assert_called_once

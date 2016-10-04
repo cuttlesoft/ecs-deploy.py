@@ -10,6 +10,7 @@ from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 
 
+# test
 def get_requirements(suffix=''):
     with open('requirements%s.txt' % suffix) as f:
         rv = f.read().splitlines()

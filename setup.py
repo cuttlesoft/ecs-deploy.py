@@ -60,9 +60,9 @@ if sys.version_info >= (3,):
 
 setup(
     name='ecs-deploy-py',
-    version='0.1.2',
+    version='0.1.3',
     url='http://github.com/cuttlesoft/ecs-deploy.py',
-    download_url='https://github.com/cuttlesoft/ecs-deploy.py/tarball/0.1.2',
+    download_url='https://github.com/cuttlesoft/ecs-deploy.py/tarball/0.1.3',
     license='MIT',
     author='Cuttlesoft, LLC',
     author_email='engineering@cuttlesoft.com',

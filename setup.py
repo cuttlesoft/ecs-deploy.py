@@ -80,9 +80,6 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=get_requirements(),
-    package_data={
-        '': ['*.txt']
-    },
     cmdclass={'test': PyTest},
     classifiers=[
         'Development Status :: 3 - Alpha',

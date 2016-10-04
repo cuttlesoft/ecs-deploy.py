@@ -11,6 +11,8 @@ ecs-deploy.py
 .. image:: https://coveralls.io/repos/github/cuttlesoft/ecs-deploy.py/badge.svg
     :target: https://coveralls.io/github/cuttlesoft/ecs-deploy.py
 
+-----
+
 Python script to instigate an automatic blue/green deployment using the Task Definition and Service entities in Amazon's ECS.
 
 Usage
@@ -28,14 +30,13 @@ Usage
 		 -p | --profile               AWS Profile to use - If you set this aws-access-key, aws-secret-key and region are needed
 		 -c | --cluster               Name of ECS cluster
 		 -i | --image                 Name of Docker image to run, ex: repo/image:latest
-									    Format: [domain][:port][/repo][/][image][:tag]
-										Examples: mariadb, mariadb:latest, silintl/mariadb, silintl/mariadb:latest, private.registry.com:8000/repo/image:tag
+                                        Format: [domain][:port][/repo][/][image][:tag]
+                                        Examples: mariadb, mariadb:latest, silintl/mariadb, silintl/mariadb:latest, private.registry.com:8000/repo/image:tag
 	Optional arguments:
 		 -D | --desired-count    The number of instantiations of the task to place and keep running in your service.
 		 -m | --min              minumumHealthyPercent: The lower limit on the number of running tasks during a deployment.
 		 -M | --max              maximumPercent: The upper limit on the number of running tasks during a deployment.
 		 -t | --timeout          Default is 90s. Script monitors ECS Service for new task definition to be running.
-
 		 -v | --verbose          Verbose output
 
     Examples:

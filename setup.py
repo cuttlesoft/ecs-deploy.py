@@ -10,12 +10,6 @@ from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 
 
-def get_requirements(suffix=''):
-    with open('requirements%s.txt' % suffix) as f:
-        rv = f.read().splitlines()
-    return rv
-
-
 class PyTest(TestCommand):
     test_package_name = 'ecs_deploy'
 
@@ -79,7 +73,16 @@ setup(
     py_modules=['ecs_deploy'],
     zip_safe=False,
     platforms='any',
-    install_requires=get_requirements(),
+    install_requires=[
+        'boto3==1.4.0',
+        'botocore==1.4.56',
+        'docutils==0.12',
+        'futures==3.0.5',
+        'jmespath==0.9.0',
+        'python-dateutil==2.5.3',
+        's3transfer==0.1.4',
+        'six==1.10.0'
+    ],
     cmdclass={'test': PyTest},
     classifiers=[
         'Development Status :: 3 - Alpha',

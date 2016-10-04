@@ -29,5 +29,5 @@ deploy:
     secure: qx92jk3/l3Pn23pedqHUhkW0asY/nUpdweBdBgdwCA97ZEEF5HNzIpX/d3SVXc2Gn6ONM454oOraf+VBkSxDaVAdHP2utIn0ZM//YjodMbKyU4J9fZEmr45wDrSBROzGLKrVqhjuu6aFQd+HDgJb9Eex4bGymJ8Gj+aJT6XiA7hMibTDqFad6rZVNN7+BYX5geEA+tXaGucYjuAn7rfGZpdM0uE0wvFPYYvyDq75SsMUs3mfYFCRWYbHzeRxN/g2+YlKnLYzh1U13SVQmgaI51m17t8fRYqq+aI9fixEqygwn31DxrTTiY8FsTj/q2XTSj+zFRkXx6XRNcuN86sNufL8Ch3ERiUxEJxG/YQSir9qvlRgXdEnDvfxdknwGh84SBghmIIFKeC9cGaxMi3fJjQiKP+afA9HN4HZ0V2vsu6PfSepWCfXOTpukEQdjxypv3YWSqa5Lraf20jb8nSToPjixKZDcldKHP2/XjDBjws6RL2bSsrbvz9/yENdfQyWdwzYv2H+oR97B8iHdnZT3pNykyK3LZ1VC0vXwhx6fuh1RcagW1CekRGcdRfwt0XwEpPdLfHQ+dAzd0SjdPK/RraWJKFz5qu//+zuulCOOq9fIiO8nOEWTnpnSqdBvKXgDM0gbEbM9/6972fZGT2Omx/e699+b17VE9dYFDXZd2A=
   on:
     repo: cuttlesoft/ecs-deploy.py
-    branch: master
+    branch: travis
     condition: $TRAVIS_PYTHON_VERSION = "2.7"

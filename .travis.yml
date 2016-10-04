@@ -30,11 +30,12 @@ deploy:
   on:
     branch: master
     repo: cuttlesoft/ecs-deploy.py
+# deploy:
   # production pypi
-  provider: pypi
-  user: cuttlesoft
-  password:
-    secure: Hmld9fYD4TqKkoq2t+L3fShXZnEd48ygEkers2hxk80Tjvc6rZIAs6tSLxRKO8joAu1VYNCprOpmByZaKi2/X0jdgJzGi/0z70gsNfxVezz4JtWH5+YgzZaxnh3o8jVemhrP9LiQTSiO6XdBNpnp3W5gZbMrWjLx+OTN7havFln6lu/kDcNzcux1EHFNqvu0L4AP4izKp7XesHSUSEJJ2WfmNgqlaOT2EdWYKYxwMiEpgCvgqQmLIGRHUox2qmvqrL1wn4FYJizX34nxPqGjISFWsgNSVL/YBbOSVaUGiJVWjoZyP1kSon4ETJTk7SbHOfkge6uNLXjJEQVU6j5FEjCCdmvj21esKOdOICya01k3OOGEDvNjjg5BNuQ5BQy3VUVsOv78JUw6VHOj8F/zv10mB+5g+iwGL60fDGcDDq2LhRUwSaLEqPas1yu2cZXHCgX6DTt9AurblISohEXZeXGOaC8GpxF8tBxmvh/ednDqNzQshpjkAhTquePS+QlKga2vF/HbRzPYVP+45RaHyceSHdB6OhHiVEg9YE4S3zohTqLbVB/CXiUX4mwXuDp50RMNVDK+2KkwtNcgHfwYoF8KKVCl/Xt7BqCSk9ZZU7iWa/II8xADI/qBZyXDxe8rXNR6TyNvZ3egWcLFyABj97jGWNylwMK5qtL6/fbVbcQ=
-  on:
-    branch: release
-    repo: cuttlesoft/ecs-deploy.py
+  # provider: pypi
+  # user: cuttlesoft
+  # password:
+  #   secure: Hmld9fYD4TqKkoq2t+L3fShXZnEd48ygEkers2hxk80Tjvc6rZIAs6tSLxRKO8joAu1VYNCprOpmByZaKi2/X0jdgJzGi/0z70gsNfxVezz4JtWH5+YgzZaxnh3o8jVemhrP9LiQTSiO6XdBNpnp3W5gZbMrWjLx+OTN7havFln6lu/kDcNzcux1EHFNqvu0L4AP4izKp7XesHSUSEJJ2WfmNgqlaOT2EdWYKYxwMiEpgCvgqQmLIGRHUox2qmvqrL1wn4FYJizX34nxPqGjISFWsgNSVL/YBbOSVaUGiJVWjoZyP1kSon4ETJTk7SbHOfkge6uNLXjJEQVU6j5FEjCCdmvj21esKOdOICya01k3OOGEDvNjjg5BNuQ5BQy3VUVsOv78JUw6VHOj8F/zv10mB+5g+iwGL60fDGcDDq2LhRUwSaLEqPas1yu2cZXHCgX6DTt9AurblISohEXZeXGOaC8GpxF8tBxmvh/ednDqNzQshpjkAhTquePS+QlKga2vF/HbRzPYVP+45RaHyceSHdB6OhHiVEg9YE4S3zohTqLbVB/CXiUX4mwXuDp50RMNVDK+2KkwtNcgHfwYoF8KKVCl/Xt7BqCSk9ZZU7iWa/II8xADI/qBZyXDxe8rXNR6TyNvZ3egWcLFyABj97jGWNylwMK5qtL6/fbVbcQ=
+  # on:
+  #   branch: release
+  #   repo: cuttlesoft/ecs-deploy.py

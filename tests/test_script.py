@@ -1,4 +1,3 @@
-import pytest
 import mock
 import boto3
 from moto import mock_ecs
@@ -126,7 +125,7 @@ class TestCLI(object):
             'cluster': mock_cluster['cluster']['clusterName'],
             'task_definition': mock_task['taskDefinition']['family'],
             'service_name': mock_service['service']['serviceName'],
-            'image': 'mock_image'
+            'container_image': ['string=mock_image']
         }
 
         self.mock_cli.cluster = mock_cluster['cluster']
@@ -231,7 +230,7 @@ class TestCLI(object):
         assert 'family' in mock_kwargs
         assert 'containerDefinitions' in mock_kwargs
         assert mock_kwargs['containerDefinitions'][0]['image'] == \
-            mock_cli.args['image']
+            mock_cli.args['container_image'][0].split('=')[1]
         assert mock_kwargs['family'] == mock_cli.task_definition['family']
 
     def test_client_kwargs_with_update_service(self):
@@ -343,23 +342,17 @@ class TestCLI(object):
     def test_client_kwargs_with_describe_tasks(self):
         mock_cli, client = self.setUp()
         mock_cli.service_name = mock_cli.args['service_name']
+        mock_cli.running_tasks = [""]
 
-        with mock.patch.object(mock_cli, 'client_fn') as mock_fn:
-            mock_list_tasks_response = {
-                'taskArns': [
-                    mock_cli.task_definition['taskDefinitionArn']
-                ]
-            }
-            mock_fn.return_value = mock_list_tasks_response
-            mock_kwargs = mock_cli.client_kwargs('describe_tasks')
+        mock_kwargs = mock_cli.client_kwargs('describe_tasks')
 
-            assert 'cluster' in mock_kwargs
-            assert 'tasks' in mock_kwargs
-            assert mock_kwargs['cluster']['clusterName'] == \
-                mock_cli.args['cluster']
-            assert mock_kwargs['tasks'] == mock_list_tasks_response['taskArns']
+        assert 'cluster' in mock_kwargs
+        assert 'tasks' in mock_kwargs
+        assert mock_kwargs['cluster']['clusterName'] == \
+            mock_cli.args['cluster']
+        assert mock_kwargs['tasks'] == mock_cli.running_tasks
 
-    def test_client_kwargs_with_describe_tasks(self):
+    def test_client_kwargs_with_list_services_once(self):
         mock_cli, client = self.setUp()
         mock_cli.client = client
 

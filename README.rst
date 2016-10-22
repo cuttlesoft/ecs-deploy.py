@@ -37,9 +37,13 @@ To run the script::
 		 -r | --region                AWS Region Name. May also be set as environment variable AWS_DEFAULT_REGION
 		 -p | --profile               AWS Profile to use - If you set this aws-access-key, aws-secret-key and region are needed
 		 -c | --cluster               Name of ECS cluster
-		 -i | --image                 Name of Docker image to run, ex: repo/image:latest
-                                        Format: [domain][:port][/repo][/][image][:tag]
-                                        Examples: mariadb, mariadb:latest, silintl/mariadb, silintl/mariadb:latest, private.registry.com:8000/repo/image:tag
+		 -l |--container-image CONTAINER_IMAGE
+                                      Name of the container with the name of Docker image to
+                                      run Format: [container_name]=[domain][:port][/repo][/]
+                                      [image][:tag] Examples: db=mariadb,
+                                      database=mariadb:latest, db=silintl/mariadb:latest,
+                                      my_container|private.registry.com:8000/repo/image:tag.
+                                      You can use this argument multiple times to replace
 	Optional arguments:
 		 -D | --desired-count    The number of instantiations of the task to place and keep running in your service.
 		 -m | --min              minumumHealthyPercent: The lower limit on the number of running tasks during a deployment.

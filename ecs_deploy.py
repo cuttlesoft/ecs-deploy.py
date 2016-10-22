@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
     ecs-deploy.py
@@ -26,7 +27,9 @@ class CLI(object):
                                            'aws_access_key_id')
             credentials = self._arg_kwargs(credentials, 'aws_secret_key',
                                            'aws_secret_access_key')
-            credentials = self._arg_kwargs(credentials, 'aws_region', 'region')
+            credentials = self._arg_kwargs(credentials, 'aws_region',
+                                           'region_name')
+
             # init boto3 ecs client
             self.client = boto3.client('ecs', **credentials)
         except ClientError as err:
@@ -77,7 +80,7 @@ class CLI(object):
 
         parser.add_argument(
             '-r',
-            '--region',
+            '--aws-region',
             help='AWS Region Name. May also be set as environment variable \
                 AWS_DEFAULT_REGION')
 
@@ -103,13 +106,17 @@ class CLI(object):
             help='Name of ECS cluster')
 
         parser.add_argument(
-            '-i',
-            '--image',
+            '-l',
+            '--container-image',
+            action='append',
             required=True,
-            help='Name of Docker image to run, ex: repo/image:latest\nFormat: \
-                [domain][:port][/repo][/][image][:tag]\nExamples: mariadb, \
-                mariadb:latest, silintl/mariadb,\nsilintl/mariadb:latest, \
-                private.registry.com:8000/repo/image:tag')
+            help='Name of the container with the name of Docker image to run\
+                \nFormat: \
+                [container_name]=[domain][:port][/repo][/][image][:tag]\
+                \nExamples: db=mariadb, database=mariadb:latest, \
+                db=silintl/mariadb:latest, \
+                my_container|private.registry.com:8000/repo/image:tag. \
+                You can use this argument multiple times to replace images.')
 
         # OPTIONAL ARGUMENTS
 
@@ -166,26 +173,40 @@ class CLI(object):
         self.task_definition_name = self._task_definition_name()
         self.service_name = self._service_name()
 
-        self.task_definition = \
-            self.client_fn('describe_task_definition')['taskDefinition']
-        self.new_task_definition = \
-            self.client_fn('register_task_definition')['taskDefinition']
+        self.task_definition = self.client_fn(
+            'describe_task_definition')['taskDefinition']
+        print('Current task definition: %s' %
+              self.task_definition['taskDefinitionArn'])
+
+        self.new_task_definition = self.client_fn(
+            'register_task_definition')['taskDefinition']
+        print('New task definition: %s' %
+              self.new_task_definition['taskDefinitionArn'])
 
         if self.task_definition:
             if not self.client_fn('update_service'):
                 sys.exit(1)
 
             # loop for desired timeout
-            timeout = self.args.get('timeout') or time.time() + 90
+            timeout = self.args.get('timeout') or 90
+            started_at = time.time()
             while True:
-                updated = False
-                running_tasks = self.client_fn('describe_tasks')['tasks']
-                for task in running_tasks:
+                self.running_tasks = self.client_fn('list_tasks')['taskArns']
+
+                if len(self.running_tasks) > 0:
+                    described_tasks = self.client_fn('describe_tasks')['tasks']
+                else:
+                    described_tasks = []
+
+                for task in described_tasks:
                     if task['taskDefinitionArn'] == \
                             self.new_task_definition['taskDefinitionArn']:
-                        print('SUCCESS')
-                        updated = True
-                if updated or time.time() > timeout:
+                        print('Service updated successfully, '
+                              'new task definition running.')
+                        return
+                if time.time() > started_at + timeout:
+                    print('ERROR: New task definition not running'
+                          'within %d seconds' % timeout)
                     sys.exit(1)
                 time.sleep(1)
 
@@ -235,10 +256,22 @@ class CLI(object):
             kwargs['family'] = self.task_definition['family']
             kwargs['containerDefinitions'] = \
                 self.task_definition['containerDefinitions']
+
             # optional kwargs from args
-            if self.args.get('image'):
-                kwargs['containerDefinitions'][0]['image'] = \
-                    self.args.get('image')
+            for ci in self.args.get('container_image'):
+                ci_container_name, ci_image = ci.split('=')
+                container_found = False
+
+                for cd in kwargs['containerDefinitions']:
+                    if cd['name'] == ci_container_name:
+                        cd['image'] = ci_image
+                        container_found = True
+
+                if not container_found:
+                    print('Container %s not found in the task definition %s' %
+                          (ci_container_name,
+                           self.task_definition['taskDefinitionArn']))
+                    sys.exit(1)
 
         elif fn == 'update_service':
             kwargs['cluster'] = self.cluster
@@ -260,7 +293,7 @@ class CLI(object):
 
         elif fn == 'describe_tasks':
             kwargs['cluster'] = self.cluster
-            kwargs['tasks'] = self.client_fn('list_tasks')['taskArns']
+            kwargs['tasks'] = self.running_tasks
 
         return kwargs
 

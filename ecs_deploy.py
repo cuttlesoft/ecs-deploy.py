@@ -310,5 +310,9 @@ class CLI(object):
             print('Exception: %s' % e)
             sys.exit(1)
 
-if __name__ == '__main__':
+def main():
     CLI()
+
+if __name__ == '__main__':
+    main()
+

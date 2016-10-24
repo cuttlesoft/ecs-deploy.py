@@ -95,7 +95,7 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules'],
     entry_points={
         'console_scripts': [
-            'ecs-deploy-py = ecs_deploy:CLI'
+            'ecs-deploy-py = ecs_deploy:main'
         ]
     }
 )

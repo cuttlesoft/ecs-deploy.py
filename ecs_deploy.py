@@ -188,7 +188,7 @@ class CLI(object):
                 sys.exit(1)
 
             # loop for desired timeout
-            timeout = self.args.get('timeout') or 90
+            timeout = self._int_or_none(self.args.get('timeout')) or 90
             started_at = time.time()
             while True:
                 self.running_tasks = self.client_fn('list_tasks')['taskArns']
@@ -212,6 +212,11 @@ class CLI(object):
 
         else:
             sys.exit(1)
+
+    def _int_or_none(self, value):
+        if type(value) == str and value.isdigit():
+            return int(value)
+        return None
 
     def _task_definition_name(self):
         if self.args.get('task_definition'):

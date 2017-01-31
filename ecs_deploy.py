@@ -235,6 +235,17 @@ class CLI(object):
             kwargs['family'] = self.task_definition['family']
             kwargs['containerDefinitions'] = \
                 self.task_definition['containerDefinitions']
+
+            # add task role data if there is any
+            task_role_arn = self.new_task_definition.get('taskRoleArn')
+            if task_role_arn:
+                kwargs['taskRoleArn'] = task_role_arn
+
+            # add network mode data if there is any
+            network_mode = self.new_task_definition.get('networkMode')
+            if network_mode:
+                kwargs['networkMode'] = network_mode
+
             # optional kwargs from args
             if self.args.get('image'):
                 kwargs['containerDefinitions'][0]['image'] = \
@@ -244,6 +255,7 @@ class CLI(object):
             kwargs['cluster'] = self.cluster
             kwargs['service'] = self.service_name
             kwargs['taskDefinition'] = self.new_task_definition['family']
+
             # optional kwargs from args
             deployment_config = {}
             deployment_config = self._arg_kwargs(deployment_config, 'min',
@@ -276,6 +288,7 @@ class CLI(object):
         except Exception as e:
             print('Exception: %s' % e)
             sys.exit(1)
+
 
 if __name__ == '__main__':
     CLI()

@@ -26,7 +26,7 @@ class CLI(object):
                                            'aws_access_key_id')
             credentials = self._arg_kwargs(credentials, 'aws_secret_key',
                                            'aws_secret_access_key')
-            credentials = self._arg_kwargs(credentials, 'aws_region', 'region')
+            credentials = self._arg_kwargs(credentials, 'region', 'region_name')
             # init boto3 ecs client
             self.client = boto3.client('ecs', **credentials)
         except ClientError as err:

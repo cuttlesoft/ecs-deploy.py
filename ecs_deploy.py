@@ -11,13 +11,21 @@ import sys
 import time
 import argparse
 import boto3
+import logging
 from botocore.exceptions import ClientError
+
+logger = logging.getLogger()
 
 
 class CLI(object):
     def __init__(self):
         # get args
         self.args = self._init_parser()
+
+        if self.args.get('verbose'):
+            logging.basicConfig(level=logging.INFO)
+        else:
+            logging.basicConfig(level=logging.ERROR)
 
         # init boto3 client
         try:
@@ -30,11 +38,11 @@ class CLI(object):
             # init boto3 ecs client
             self.client = boto3.client('ecs', **credentials)
         except ClientError as err:
-            print('Failed to create boto3 client.\n%s' % err)
+            logger.error('Failed to create boto3 client.\n%s' % err)
             sys.exit(1)
 
         if not (self.args.get('task_definition') or self.args.get('service_name')):
-            print('Either task-definition or service-name must be provided.')
+            logger.error('Either task-definition or service-name must be provided.')
             sys.exit(1)
 
         # run script
@@ -128,6 +136,18 @@ class CLI(object):
                 definition to be running.')
 
         parser.add_argument(
+            '-vn',
+            '--volume-name',
+            help='The name of the volume. This name is referenced in the \
+                sourceVolume parameter of container definition mountPoints.')
+
+        parser.add_argument(
+            '-vs',
+            '--volume-source-path',
+            help='The path on the host container instance where your data \
+                volume is stored.')
+
+        parser.add_argument(
             '-e',
             '--tag-env-var',
             help='Get image tag name from environment variable. If provided \
@@ -154,24 +174,35 @@ class CLI(object):
         self.service_name = self._service_name()
 
         self.task_definition = self.client_fn('describe_task_definition')['taskDefinition']
+
+        logger.info("Deregister current ECS task definition "+self.task_definition['family']+':'+str(self.task_definition['revision']))
+        deregistered_task_definition = self.client_fn('deregister_task_definition')['taskDefinition']
+
+        logger.info("Registering new ECS task definition")
         self.new_task_definition = self.client_fn('register_task_definition')['taskDefinition']
+        logger.info("New ECS task definition "+self.new_task_definition['family']+':'+str(self.new_task_definition['revision'])+' Registered')
 
         if self.task_definition:
+            logger.info("Updating ECS service: "+self.service_name)
             if not self.client_fn('update_service'):
                 sys.exit(1)
 
             # loop for desired timeout
             timeout = self.args.get('timeout') or time.time() + 90
+            logger.info("Will wait "+str(timeout)+" secs for ECS tasks to update")
+            wait_time = 0
             while True:
+                logger.info("Waiting for ECS tasks to update......"+str(wait_time)+" secs")
                 updated = False
                 running_tasks = self.client_fn('describe_tasks')['tasks']
                 for task in running_tasks:
                     if task['taskDefinitionArn'] == self.new_task_definition['taskDefinitionArn']:
+                        logger.info("ECS task updated ")
                         updated = True
                 if updated or time.time() > timeout:
                     sys.exit(0)
-                time.sleep(1)
-
+                time.sleep(20)
+                wait_time = wait_time + 20
         else:
             sys.exit(1)
 
@@ -214,12 +245,23 @@ class CLI(object):
         elif fn == 'describe_task_definition':
             kwargs['taskDefinition'] = self.task_definition_name
 
+        elif fn == 'deregister_task_definition':
+            kwargs['taskDefinition'] = self.task_definition['family']+':'+ str(self.task_definition['revision'])
+
         elif fn == 'register_task_definition':
             kwargs['family'] = self.task_definition['family']
             kwargs['containerDefinitions'] = self.task_definition['containerDefinitions']
             # optional kwargs from args
             if self.args.get('image'):
                 kwargs['containerDefinitions'][0]['image'] = self.args.get('image')
+            if self.args.get('service_name') and self.args.get('volume_source_path'):
+                kwargs['volumes'] = []
+                volumes_sourcePath_config = {}
+                volumes_sourcePath_config["sourcePath"] = self.args.get('volume_source_path') # '/tmp/'
+                volumes_config = {}
+                volumes_config['name'] = self.args.get('volume_name')  # "data"
+                volumes_config['host'] = volumes_sourcePath_config
+                kwargs['volumes'].append(volumes_config)
 
         elif fn == 'update_service':
             kwargs['cluster'] = self.cluster
@@ -252,10 +294,10 @@ class CLI(object):
             return response
 
         except ClientError as e:
-            print('ClientError: %s' % e)
+            logger.error('ClientError: %s' % e)
             sys.exit(1)
         except Exception as e:
-            print('Exception: %s' % e)
+            logger.error('Exception: %s' % e)
             sys.exit(1)
 
 if __name__ == '__main__':

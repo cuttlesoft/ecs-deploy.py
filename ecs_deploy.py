@@ -132,6 +132,7 @@ class CLI(object):
         parser.add_argument(
             '-t',
             '--timeout',
+            type=int,
             help='Default is 90s. Script monitors ECS Service for new task \
                 definition to be running.')
 
@@ -188,8 +189,9 @@ class CLI(object):
                 sys.exit(1)
 
             # loop for desired timeout
-            timeout = self.args.get('timeout') or time.time() + 90
+            timeout = self.args.get('timeout') or 90
             logger.info("Will wait "+str(timeout)+" secs for ECS tasks to update")
+            timeout = time.time() + timeout
             wait_time = 0
             while True:
                 logger.info("Waiting for ECS tasks to update......"+str(wait_time)+" secs")

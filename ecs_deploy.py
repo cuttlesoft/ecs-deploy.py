@@ -251,7 +251,7 @@ class CLI(object):
 
         elif fn == 'deregister_task_definition':
             kwargs['taskDefinition'] = self.task_definition['family'] + ':' + \
-                 str(self.task_definition['revision'])
+                str(self.task_definition['revision'])
 
         elif fn == 'register_task_definition':
             kwargs['family'] = self.task_definition['family']

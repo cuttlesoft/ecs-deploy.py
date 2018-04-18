@@ -176,13 +176,13 @@ class CLI(object):
 
         self.task_definition = self.client_fn('describe_task_definition')['taskDefinition']
 
-        logger.info("Deregister current ECS task definition " + self.task_definition['family'] + \
+        logger.info("Deregister current ECS task definition " + self.task_definition['family'] +
                                                        ':' + str(self.task_definition['revision']))
         self.client_fn('deregister_task_definition')['taskDefinition']
 
         logger.info("Registering new ECS task definition")
         self.new_task_definition = self.client_fn('register_task_definition')['taskDefinition']
-        logger.info("New ECS task definition " + self.new_task_definition['family'] + ':' + \
+        logger.info("New ECS task definition " + self.new_task_definition['family'] + ':' +
                                          str(self.new_task_definition['revision']) + ' Registered')
 
         if self.task_definition:
@@ -251,7 +251,7 @@ class CLI(object):
 
         elif fn == 'deregister_task_definition':
             kwargs['taskDefinition'] = self.task_definition['family'] + ':' + \
-                                             str(self.task_definition['revision'])
+                 str(self.task_definition['revision'])
 
         elif fn == 'register_task_definition':
             kwargs['family'] = self.task_definition['family']

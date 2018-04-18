@@ -176,25 +176,25 @@ class CLI(object):
 
         self.task_definition = self.client_fn('describe_task_definition')['taskDefinition']
 
-        logger.info("Deregister current ECS task definition "+self.task_definition['family']+':'+str(self.task_definition['revision']))
+        logger.info("Deregister current ECS task definition " + self.task_definition['family'] + ':' + str(self.task_definition['revision']))
         deregistered_task_definition = self.client_fn('deregister_task_definition')['taskDefinition']
 
         logger.info("Registering new ECS task definition")
         self.new_task_definition = self.client_fn('register_task_definition')['taskDefinition']
-        logger.info("New ECS task definition "+self.new_task_definition['family']+':'+str(self.new_task_definition['revision'])+' Registered')
+        logger.info("New ECS task definition " + self.new_task_definition['family'] + ':' + str(self.new_task_definition['revision']) + ' Registered')
 
         if self.task_definition:
-            logger.info("Updating ECS service: "+self.service_name)
+            logger.info("Updating ECS service: " + self.service_name)
             if not self.client_fn('update_service'):
                 sys.exit(1)
 
             # loop for desired timeout
             timeout = self.args.get('timeout') or 90
-            logger.info("Will wait "+str(timeout)+" secs for ECS tasks to update")
+            logger.info("Will wait " + str(timeout) + " secs for ECS tasks to update")
             timeout = time.time() + timeout
             wait_time = 0
             while True:
-                logger.info("Waiting for ECS tasks to update......"+str(wait_time)+" secs")
+                logger.info("Waiting for ECS tasks to update......" + str(wait_time) + " secs")
                 updated = False
                 running_tasks = self.client_fn('describe_tasks')['tasks']
                 for task in running_tasks:
@@ -248,7 +248,7 @@ class CLI(object):
             kwargs['taskDefinition'] = self.task_definition_name
 
         elif fn == 'deregister_task_definition':
-            kwargs['taskDefinition'] = self.task_definition['family']+':'+ str(self.task_definition['revision'])
+            kwargs['taskDefinition'] = self.task_definition['family'] + ':' + str(self.task_definition['revision'])
 
         elif fn == 'register_task_definition':
             kwargs['family'] = self.task_definition['family']
@@ -259,9 +259,9 @@ class CLI(object):
             if self.args.get('service_name') and self.args.get('volume_source_path'):
                 kwargs['volumes'] = []
                 volumes_sourcePath_config = {}
-                volumes_sourcePath_config["sourcePath"] = self.args.get('volume_source_path') # '/tmp/'
+                volumes_sourcePath_config["sourcePath"] = self.args.get('volume_source_path')
                 volumes_config = {}
-                volumes_config['name'] = self.args.get('volume_name')  # "data"
+                volumes_config['name'] = self.args.get('volume_name')
                 volumes_config['host'] = volumes_sourcePath_config
                 kwargs['volumes'].append(volumes_config)
 

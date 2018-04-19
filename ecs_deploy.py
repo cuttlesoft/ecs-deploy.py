@@ -196,15 +196,19 @@ class CLI(object):
             timeout = time.time() + timeout
             wait_time = 0
             while True:
-                logger.info("Waiting for ECS tasks to update......" + str(wait_time) + " secs")
+                logger.info("Waiting for ECS task to update......" + str(wait_time) + " secs")
                 updated = False
                 running_tasks = self.client_fn('describe_tasks')['tasks']
                 for task in running_tasks:
                     if task['taskDefinitionArn'] == self.new_task_definition['taskDefinitionArn']:
-                        logger.info("ECS task updated ")
+                        logger.info("ECS task updated")
                         updated = True
-                if updated or time.time() > timeout:
+                if updated:
                     sys.exit(0)
+                if time.time() > timeout:
+                    logger.error("Timed out because ECS task had not updated after " +
+                                                    str(wait_time) + " secs")
+                    sys.exit(1)               
                 time.sleep(20)
                 wait_time = wait_time + 20
         else:

@@ -208,7 +208,7 @@ class CLI(object):
                 if time.time() > timeout:
                     logger.error("Timed out because ECS task had not updated after " +
                                                     str(wait_time) + " secs")
-                    sys.exit(1)               
+                    sys.exit(1)
                 time.sleep(20)
                 wait_time = wait_time + 20
         else:

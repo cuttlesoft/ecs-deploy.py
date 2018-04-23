@@ -45,7 +45,9 @@ To run the script::
 		 -m | --min              minumumHealthyPercent: The lower limit on the number of running tasks during a deployment.
 		 -M | --max              maximumPercent: The upper limit on the number of running tasks during a deployment.
 		 -t | --timeout          Default is 90s. Script monitors ECS Service for new task definition to be running.
-		 -v | --verbose          Verbose output
+		 -v | --verbose          Verbose output.
+     -vn | --volume-name     The name of the volume. This name is referenced in the sourceVolume parameter of container definition mountPoints.
+     -vs | --volume-source-path   The path on the host container instance where your data volume is stored.
 
     Examples:
     Simple (Using env vars for AWS settings):
@@ -54,7 +56,7 @@ To run the script::
 
     All options:
 
-    	$ ecs-deploy-py -k ABC123 -s SECRETKEY -r us-east-1 -c production1 -n doorman-service -i docker.repo.com/doorman -m 50 -M 100 -t 240 -D 2 -v
+    	$ ecs-deploy-py -k ABC123 -s SECRETKEY -r us-east-1 -c production1 -n doorman-service -i docker.repo.com/doorman -m 50 -M 100 -t 240 -D 2 -v -vn data -vs /tmp/
 
     Using profiles (for STS delegated credentials, for instance):
 

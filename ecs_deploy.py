@@ -282,7 +282,8 @@ class CLI(object):
                 kwargs['containerDefinitions'][0]['image'] = self.args.get('image')
             var_updated = False
             if self.args.get('environment_variable'):
-                logger.info("Updating environment variable " + self.args.get('environment_variable') + " in ECS task definition")
+                logger.info("Updating environment variable " +
+                    self.args.get('environment_variable') + " in ECS task definition")
                 env_var = self.args.get('environment_variable').split("=")
                 env_vars = kwargs['containerDefinitions'][0]['environment']
                 for var in env_vars:
@@ -291,11 +292,11 @@ class CLI(object):
                         var_updated = True
                         kwargs['containerDefinitions'][0]['environment'] = env_vars
                 if not var_updated:
-	               kwargs['containerDefinitions'][0]['environment'].extend([
-	                  {
-	                     'name' : env_var[0],
-	                     'value' : env_var[1]
-	                   }])
+                    kwargs['containerDefinitions'][0]['environment'].extend([
+                        {
+                            'name': env_var[0],
+                            'value': env_var[1]
+                        }])
             if self.args.get('service_name') and self.args.get('volume_source_path'):
                 kwargs['volumes'] = []
                 volumes_sourcePath_config = {}

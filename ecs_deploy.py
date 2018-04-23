@@ -155,6 +155,12 @@ class CLI(object):
                 this will override value specified in image name argument.')
 
         parser.add_argument(
+            '-ev',
+            '--environment-variable',
+            help='environment variable to set in task definition.  \
+                specify var=value.')
+
+        parser.add_argument(
             '-v',
             '--verbose',
             action='store_true',
@@ -176,9 +182,21 @@ class CLI(object):
 
         self.task_definition = self.client_fn('describe_task_definition')['taskDefinition']
 
-        logger.info("Deregister current ECS task definition " + self.task_definition['family'] +
-                                                       ':' + str(self.task_definition['revision']))
-        self.client_fn('deregister_task_definition')['taskDefinition']
+        if self.args.get('max_definitions'):
+            family = self.task_definition['family']
+            max_definitions = self.args.get('max_definitions')
+            task_definitions = self.client_fn('list_task_definitions')
+            task_definition_arns = task_definitions['taskDefinitionArns']
+            if len(task_definition_arns) > max_definitions:
+                logger.info("DeRegistering old ECS task definition as more than " +
+                                    str(max_definitions) + " for family " + family)
+                num_to_delete = len(task_definition_arns) - max_definitions
+                for task_def_arn in task_definition_arns:
+                    if num_to_delete > 0:
+                        self.deregister_task_definition = task_def_arn
+                        logger.info("Deregistering old ECS task definition " + task_def_arn)
+                        self.client_fn('deregister_task_definition')
+                        num_to_delete = num_to_delete - 1
 
         logger.info("Registering new ECS task definition")
         self.new_task_definition = self.client_fn('register_task_definition')['taskDefinition']
@@ -192,7 +210,7 @@ class CLI(object):
 
             # loop for desired timeout
             timeout = self.args.get('timeout') or 90
-            logger.info("Will wait " + str(timeout) + " secs for ECS tasks to update")
+            logger.info("Will wait " + str(timeout) + " secs for first ECS task to update")
             timeout = time.time() + timeout
             wait_time = 0
             while True:
@@ -254,8 +272,7 @@ class CLI(object):
             kwargs['taskDefinition'] = self.task_definition_name
 
         elif fn == 'deregister_task_definition':
-            kwargs['taskDefinition'] = self.task_definition['family'] + ':' + \
-                str(self.task_definition['revision'])
+            kwargs['taskDefinition'] = self.deregister_task_definition
 
         elif fn == 'register_task_definition':
             kwargs['family'] = self.task_definition['family']
@@ -263,6 +280,22 @@ class CLI(object):
             # optional kwargs from args
             if self.args.get('image'):
                 kwargs['containerDefinitions'][0]['image'] = self.args.get('image')
+            var_updated = False
+            if self.args.get('environment_variable'):
+                logger.info("Updating environment variable " + self.args.get('environment_variable') + " in ECS task definition")
+                env_var = self.args.get('environment_variable').split("=")
+                env_vars = kwargs['containerDefinitions'][0]['environment']
+                for var in env_vars:
+                    if var['name'] == env_var[0]:
+                        var['value'] = env_var[1]
+                        var_updated = True
+                        kwargs['containerDefinitions'][0]['environment'] = env_vars
+                if not var_updated:
+	               kwargs['containerDefinitions'][0]['environment'].extend([
+	                  {
+	                     'name' : env_var[0],
+	                     'value' : env_var[1]
+	                   }])
             if self.args.get('service_name') and self.args.get('volume_source_path'):
                 kwargs['volumes'] = []
                 volumes_sourcePath_config = {}
@@ -284,6 +317,9 @@ class CLI(object):
                                                  'maximumPercent')
             kwargs['deploymentConfiguration'] = deployment_config
             kwargs = self._arg_kwargs(kwargs, 'desired_count')
+
+        elif fn == 'list_task_definitions':
+            kwargs['familyPrefix'] = self.task_definition['family']
 
         elif fn == 'list_tasks':
             kwargs['cluster'] = self.cluster

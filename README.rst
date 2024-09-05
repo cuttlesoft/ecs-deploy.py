@@ -1,6 +1,8 @@
 =============
 ecs-deploy.py
 =============
+.. image:: https://static.cuttlesoft.com/wp-content/uploads/2024/09/05191111/970x250-banner-variation-21.png
+    :alt: AWS Consulting Services: Expert cloud architecture, DevOps, serverless computing, containerization, microservices, CI/CD pipelines, infrastructure as code, cloud migration, performance optimization, cost management, security best practices, and scalable solutions for enterprises
 
 .. image:: https://img.shields.io/pypi/v/ecs-deploy-py.svg
     :target: https://pypi.python.org/pypi/ecs-deploy-py
@@ -109,3 +111,12 @@ Contributing
 If you're interested in contributing to ecs-deploy.py, get started by creating an issue `here`_. Thanks!
 
 .. _here: https://github.com/cuttlesoft/ecs-deploy.py/issues
+
+
+🏗️ Building on AWS and ECS? Partner with Seasoned Cloud Architects
+------------
+At Cuttlesoft, we specialize in `AWS Consulting`_, including advanced techniques like blue/green deployments. Whether you need assistance implementing complex deployment strategies, optimizing performance, or scaling your ECS applications, our team of expert developers is here to help.
+
+Contact us to discuss how we can elevate your AWS projects to the next level!
+
+.. _AWS Consulting: https://cuttlesoft.com/services/aws-consulting/

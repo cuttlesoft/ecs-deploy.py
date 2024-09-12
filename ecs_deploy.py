@@ -11,13 +11,21 @@ import sys
 import time
 import argparse
 import boto3
+import logging
 from botocore.exceptions import ClientError
+
+logger = logging.getLogger()
 
 
 class CLI(object):
     def __init__(self):
         # get args
         self.args = self._init_parser()
+
+        if self.args.get('verbose'):
+            logging.basicConfig(level=logging.INFO)
+        else:
+            logging.basicConfig(level=logging.ERROR)
 
         # init boto3 client
         try:
@@ -30,11 +38,11 @@ class CLI(object):
             # init boto3 ecs client
             self.client = boto3.client('ecs', **credentials)
         except ClientError as err:
-            print('Failed to create boto3 client.\n%s' % err)
+            logger.error('Failed to create boto3 client.\n%s' % err)
             sys.exit(1)
 
         if not (self.args.get('task_definition') or self.args.get('service_name')):
-            print('Either task-definition or service-name must be provided.')
+            logger.error('Either task-definition or service-name must be provided.')
             sys.exit(1)
 
         # run script
@@ -124,14 +132,33 @@ class CLI(object):
         parser.add_argument(
             '-t',
             '--timeout',
+            type=int,
             help='Default is 90s. Script monitors ECS Service for new task \
                 definition to be running.')
+
+        parser.add_argument(
+            '-vn',
+            '--volume-name',
+            help='The name of the volume. This name is referenced in the \
+                sourceVolume parameter of container definition mountPoints.')
+
+        parser.add_argument(
+            '-vs',
+            '--volume-source-path',
+            help='The path on the host container instance where your data \
+                volume is stored.')
 
         parser.add_argument(
             '-e',
             '--tag-env-var',
             help='Get image tag name from environment variable. If provided \
                 this will override value specified in image name argument.')
+
+        parser.add_argument(
+            '-ev',
+            '--environment-variable',
+            help='environment variable to set in task definition.  \
+                specify var=value.')
 
         parser.add_argument(
             '-v',
@@ -154,24 +181,54 @@ class CLI(object):
         self.service_name = self._service_name()
 
         self.task_definition = self.client_fn('describe_task_definition')['taskDefinition']
+
+        if self.args.get('max_definitions'):
+            family = self.task_definition['family']
+            max_definitions = self.args.get('max_definitions')
+            task_definitions = self.client_fn('list_task_definitions')
+            task_definition_arns = task_definitions['taskDefinitionArns']
+            if len(task_definition_arns) > max_definitions:
+                logger.info("DeRegistering old ECS task definition as more than " +
+                                    str(max_definitions) + " for family " + family)
+                num_to_delete = len(task_definition_arns) - max_definitions
+                for task_def_arn in task_definition_arns:
+                    if num_to_delete > 0:
+                        self.deregister_task_definition = task_def_arn
+                        logger.info("Deregistering old ECS task definition " + task_def_arn)
+                        self.client_fn('deregister_task_definition')
+                        num_to_delete = num_to_delete - 1
+
+        logger.info("Registering new ECS task definition")
         self.new_task_definition = self.client_fn('register_task_definition')['taskDefinition']
+        logger.info("New ECS task definition " + self.new_task_definition['family'] + ':' +
+                                         str(self.new_task_definition['revision']) + ' Registered')
 
         if self.task_definition:
+            logger.info("Updating ECS service: " + self.service_name)
             if not self.client_fn('update_service'):
                 sys.exit(1)
 
             # loop for desired timeout
-            timeout = self.args.get('timeout') or time.time() + 90
+            timeout = self.args.get('timeout') or 90
+            logger.info("Will wait " + str(timeout) + " secs for first ECS task to update")
+            timeout = time.time() + timeout
+            wait_time = 0
             while True:
+                logger.info("Waiting for ECS task to update......" + str(wait_time) + " secs")
                 updated = False
                 running_tasks = self.client_fn('describe_tasks')['tasks']
                 for task in running_tasks:
                     if task['taskDefinitionArn'] == self.new_task_definition['taskDefinitionArn']:
+                        logger.info("ECS task updated")
                         updated = True
-                if updated or time.time() > timeout:
+                if updated:
                     sys.exit(0)
-                time.sleep(1)
-
+                if time.time() > timeout:
+                    logger.error("Timed out because ECS task had not updated after " +
+                                                    str(wait_time) + " secs")
+                    sys.exit(1)
+                time.sleep(20)
+                wait_time = wait_time + 20
         else:
             sys.exit(1)
 
@@ -214,12 +271,40 @@ class CLI(object):
         elif fn == 'describe_task_definition':
             kwargs['taskDefinition'] = self.task_definition_name
 
+        elif fn == 'deregister_task_definition':
+            kwargs['taskDefinition'] = self.deregister_task_definition
+
         elif fn == 'register_task_definition':
             kwargs['family'] = self.task_definition['family']
             kwargs['containerDefinitions'] = self.task_definition['containerDefinitions']
             # optional kwargs from args
             if self.args.get('image'):
                 kwargs['containerDefinitions'][0]['image'] = self.args.get('image')
+            var_updated = False
+            if self.args.get('environment_variable'):
+                logger.info("Updating environment variable " +
+                    self.args.get('environment_variable') + " in ECS task definition")
+                env_var = self.args.get('environment_variable').split("=")
+                env_vars = kwargs['containerDefinitions'][0]['environment']
+                for var in env_vars:
+                    if var['name'] == env_var[0]:
+                        var['value'] = env_var[1]
+                        var_updated = True
+                        kwargs['containerDefinitions'][0]['environment'] = env_vars
+                if not var_updated:
+                    kwargs['containerDefinitions'][0]['environment'].extend([
+                        {
+                            'name': env_var[0],
+                            'value': env_var[1]
+                        }])
+            if self.args.get('service_name') and self.args.get('volume_source_path'):
+                kwargs['volumes'] = []
+                volumes_sourcePath_config = {}
+                volumes_sourcePath_config["sourcePath"] = self.args.get('volume_source_path')
+                volumes_config = {}
+                volumes_config['name'] = self.args.get('volume_name')
+                volumes_config['host'] = volumes_sourcePath_config
+                kwargs['volumes'].append(volumes_config)
 
         elif fn == 'update_service':
             kwargs['cluster'] = self.cluster
@@ -233,6 +318,9 @@ class CLI(object):
                                                  'maximumPercent')
             kwargs['deploymentConfiguration'] = deployment_config
             kwargs = self._arg_kwargs(kwargs, 'desired_count')
+
+        elif fn == 'list_task_definitions':
+            kwargs['familyPrefix'] = self.task_definition['family']
 
         elif fn == 'list_tasks':
             kwargs['cluster'] = self.cluster
@@ -252,10 +340,10 @@ class CLI(object):
             return response
 
         except ClientError as e:
-            print('ClientError: %s' % e)
+            logger.error('ClientError: %s' % e)
             sys.exit(1)
         except Exception as e:
-            print('Exception: %s' % e)
+            logger.error('Exception: %s' % e)
             sys.exit(1)
 
 if __name__ == '__main__':

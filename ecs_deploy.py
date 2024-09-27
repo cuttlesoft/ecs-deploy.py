@@ -220,6 +220,13 @@ class CLI(object):
             # optional kwargs from args
             if self.args.get('image'):
                 kwargs['containerDefinitions'][0]['image'] = self.args.get('image')
+            # Added for Fargate.
+            if self.task_definition['requiresCompatibilities']:
+                kwargs['executionRoleArn'] = self.task_definition['executionRoleArn']
+                kwargs['cpu'] = self.task_definition['cpu']
+                kwargs['memory'] = self.task_definition['memory']
+                kwargs['networkMode'] = self.task_definition['networkMode']
+                kwargs['requiresCompatibilities'] = self.task_definition['requiresCompatibilities']
 
         elif fn == 'update_service':
             kwargs['cluster'] = self.cluster

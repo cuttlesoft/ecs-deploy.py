@@ -21,7 +21,7 @@ moto==1.0.0
 packaging==16.8
 pbr==3.0.1
 pep8==1.7.0
-py==1.4.33
+py==1.10.0
 pyaml==16.12.2
 pyflakes==1.5.0
 pyparsing==2.2.0

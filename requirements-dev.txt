@@ -3,7 +3,7 @@ appdirs==1.4.3
 boto==2.47.0
 boto3==1.4.0
 botocore==1.4.56
-certifi==2017.4.17
+certifi==2022.12.7
 chardet==3.0.3
 cookies==2.2.1
 coverage==4.4.1
